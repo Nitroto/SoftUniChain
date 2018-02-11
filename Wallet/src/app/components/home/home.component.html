@@ -1,0 +1,19 @@
+<h1>Simple Wallet for the SoftUni Chain</h1>
+Welcome to the simple wallet for the SoftUni Chain educational testing blockchain network.
+<ul>
+  <li>The wallet keeps a <b>private key</b> and its associated <b>public key</b> and <b>blockchain address</b>.</li>
+  <li><b>ECDSA-based cryptography</b> is used, based on the <a href="https://en.bitcoin.it/wiki/Secp256k1">secp256k1
+    curve</a>.
+  </li>
+  <li>The <b>private key</b> is 256-bit integer, encoded as <b>64 hex digits</b></li>
+  <li>The <b>public key</b> is coordinate (x, y) on the secp256k1 elliptic curve, encoded in compressed form as <b>65
+    hex digits</b>:
+    <ul>
+      <li>64 hex digits for the x coordinate</li>
+      <li>1 hex digit for the odd / even of y (0 or 1) at the end</li>
+    </ul>
+  </li>
+  <li>The <b>blockchain address</b> is 160-bit RIPEMD-160 hash of the compressed public key, encoded as <b>40 hex
+    digits</b>
+  </li>
+</ul>

@@ -1,0 +1,56 @@
+<div class="row">
+  <div class="container col-5 float-left">
+    <h1>Create new wallet</h1>
+    <p>Generate a new wallet: random private key -> public key -> address.</p>
+    <form class="wallet-form">
+      <mat-form-field class="full-width">
+        <textarea matInput placeholder="Private key:" name="privateKey" id="privateKey" [(ngModel)]="wallet.privateKey"
+                  #privateKey="ngModel" required pattern="^[A-Za-z0-9]{64}$"></textarea>
+      </mat-form-field>
+
+      <mat-form-field class="full-width">
+        <textarea matInput placeholder="Public key:" name="publicKey" id="publicKey"
+                  [(ngModel)]="wallet.publicKey"></textarea>
+      </mat-form-field>
+
+      <mat-form-field class="full-width">
+        <textarea matInput placeholder="Address:" name="address" id="address" [(ngModel)]="wallet.address"></textarea>
+      </mat-form-field>
+
+      <button class="btn btn-success" (click)="generateNewWallet()">Generate New</button>
+      <button class="btn btn-primary" (click)="loadWallet()"
+              [disabled]="!privateKey.hasError('pattern') && !privateKey.hasError('required')">Load
+      </button>
+    </form>
+  </div>
+
+  <div class="col-5" *ngIf="wallet.address">
+    <div class="card text-center">
+      <ngx-qrcode
+        qrc-element-type="url"
+        [qrc-value]="wallet.address"
+        qrc-version="5">
+      </ngx-qrcode>
+      <div class="card-block">
+        <h3 class="card-title">Your balance: <b>0 SUC</b></h3>
+        <p class="card-text">{{ wallet.address }}</p>
+      </div>
+    </div>
+
+    <div class="addSomeSpace"></div>
+
+    <form class="send-form">
+      <mat-form-field class="full-width">
+        <textarea matInput placeholder="Sender:" name="sender" id="sender" [(ngModel)]="wallet.address"
+                  disabled></textarea>
+      </mat-form-field>
+
+      <mat-form-field class="full-width">
+        <textarea matInput placeholder="Recipient:" name="recipient" id="recipient"
+                  [(ngModel)]="recipient"></textarea>
+      </mat-form-field>
+
+      <button class="btn btn-success" (click)="send()">Send</button>
+    </form>
+  </div>
+</div>

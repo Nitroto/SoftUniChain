@@ -2,7 +2,7 @@
 
 namespace Miner
 {
-    class Program
+    class Miner
     {
         static void Main(string[] args)
         {

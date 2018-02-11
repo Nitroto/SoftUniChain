@@ -238,3 +238,5 @@ _Pvt_Extensions
 
 .idea/
 .vscode/
+Wallet/.idea/
+Wallet/node_modules/

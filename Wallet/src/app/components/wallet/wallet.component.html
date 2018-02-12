@@ -1,11 +1,13 @@
 <div class="row">
   <div class="container col-5 float-left">
-    <h1>Create new wallet</h1>
-    <p>Generate a new wallet: random private key -> public key -> address.</p>
+    <h1>Create or load wallet</h1>
+    <p>To generate a new wallet just press <b>Generate New</b> button and you will receive random private key, public key and address.</p>
+    <p>To load your wallet enter your wallet private key (compressed ECDSA key, 65 hex digits) and press <b>Load</b> button.</p>
     <form class="wallet-form">
       <mat-form-field class="full-width">
         <textarea matInput placeholder="Private key:" name="privateKey" id="privateKey" [(ngModel)]="wallet.privateKey"
-                  #privateKey="ngModel" required pattern="^[A-Za-z0-9]{64}$"></textarea>
+                  #privateKey="ngModel" required pattern="^[A-Za-z0-9]{64}$">
+        </textarea>
       </mat-form-field>
 
       <mat-form-field class="full-width">
@@ -22,35 +24,55 @@
               [disabled]="!privateKey.hasError('pattern') && !privateKey.hasError('required')">Load
       </button>
     </form>
-  </div>
-
-  <div class="col-5" *ngIf="wallet.address">
-    <div class="card text-center">
-      <ngx-qrcode
-        qrc-element-type="url"
-        [qrc-value]="wallet.address"
-        qrc-version="5">
-      </ngx-qrcode>
-      <div class="card-block">
-        <h3 class="card-title">Your balance: <b>0 SUC</b></h3>
-        <p class="card-text">{{ wallet.address }}</p>
-      </div>
-    </div>
 
     <div class="addSomeSpace"></div>
 
-    <form class="send-form">
-      <mat-form-field class="full-width">
-        <textarea matInput placeholder="Sender:" name="sender" id="sender" [(ngModel)]="wallet.address"
-                  disabled></textarea>
-      </mat-form-field>
-
-      <mat-form-field class="full-width">
-        <textarea matInput placeholder="Recipient:" name="recipient" id="recipient"
-                  [(ngModel)]="recipient"></textarea>
-      </mat-form-field>
-
-      <button class="btn btn-success" (click)="send()">Send</button>
-    </form>
   </div>
+
+  <div class="col-5" >
+
+    <mat-form-field class="full-width">
+      <mat-select placeholder="Select node" [(value)]="selected">
+        <mat-option value="option1">node 1</mat-option>
+        <mat-option value="option2">node 2</mat-option>
+        <mat-option value="option3">node 3</mat-option>
+        <mat-option value="option4">node 4</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <div *ngIf="wallet.address">
+      <div class="card text-center">
+        <ngx-qrcode
+          qrc-element-type="url"
+          [qrc-value]="wallet.address"
+          qrc-version="5">
+        </ngx-qrcode>
+        <div class="card-block">
+          <h3 class="card-title">Your balance: <b>0 SUC</b></h3>
+          <p class="card-text">{{ wallet.address }}</p>
+        </div>
+      </div>
+
+      <div class="addSomeSpace"></div>
+
+      <form class="send-form">
+        <mat-form-field class="full-width">
+          <textarea matInput placeholder="Sender:" name="sender" id="sender" [(ngModel)]="wallet.address" disabled></textarea>
+        </mat-form-field>
+
+        <mat-form-field class="full-width">
+          <textarea matInput placeholder="Recipient:" name="recipient" id="recipient" [(ngModel)]="recipient" required></textarea>
+        </mat-form-field>
+
+        <mat-form-field class="full-width">
+          <input matInput placeholder="Amount:" type="number" name="amount" id="amount"
+                 [(ngModel)]="amount" required>
+          <span matPrefix>$&nbsp;</span>
+        </mat-form-field>
+
+        <button class="btn btn-success" (click)="signTransaction()" [disabled]="!recipient">Sign</button>
+      </form>
+    </div>
+    </div>
+
 </div>

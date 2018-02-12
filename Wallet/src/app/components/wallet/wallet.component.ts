@@ -1,6 +1,8 @@
-import {Component, OnInit} from '@angular/core';
-// import elliptic from 'elliptic';
-// import hashes from 'hashes';
+import { Component, OnInit } from '@angular/core';
+import { MatDialog, MatDialogRef } from '@angular/material';
+
+import * as elliptic from 'elliptic';
+import * as hashes from 'jshashes';
 
 @Component({
   selector: 'create',
@@ -9,14 +11,16 @@ import {Component, OnInit} from '@angular/core';
 })
 export class WalletComponent implements OnInit {
 
-
   wallet = {
     privateKey: '',
     publicKey: '',
     address: ''
   };
 
-  constructor() {
+  selected = 'option1';
+  transactionDialog: MatDialogRef<TransactionContentDialog>;
+
+  constructor(public dialog: MatDialog) {
   }
 
   ngOnInit(): void {
@@ -29,33 +33,69 @@ export class WalletComponent implements OnInit {
     }
 
     if (sessionStorage['address']) {
-      this.wallet.privateKey = sessionStorage['address'];
+      this.wallet.address = sessionStorage['address'];
     }
   }
 
   generateNewWallet() {
-    // let ec = new elliptic.ec('secp256k1');
-    // let keyPair = ec.generatePair();
-    // this.saveKey(keyPair);
-    this.wallet = {
-      privateKey: 'generated',
-      publicKey: 'generated',
-      address: 'generated'
-    };
+    const ec = new elliptic.ec('secp256k1');
+    const keyPair = ec.genKeyPair();
+    this.saveKey(keyPair);
   }
 
-  send(){
+
+  loadWallet() {
+    const userPrivateKey = this.wallet.privateKey;
+    const ec = new elliptic.ec('secp256k1');
+    const keyPair = ec.keyFromPrivate(userPrivateKey);
+    this.saveKey(keyPair);
+  }
+
+  // private dialogRef: MatDialogRef<DialogContentDialog>
+
+  signTransaction() {
+    this.openDialog();
+    console.log('Sign...');
+  }
+
+  openDialog() {
+    this.transactionDialog = this.dialog.open(TransactionContentDialog, {
+      hasBackdrop: false,
+      height: '350px'
+    });
+
 
   }
 
-  private loadWallet() {
+  private sendSignedTransaction() {
+    this.transactionDialog.afterClosed().subscribe(result => {
+      console.log(`Dialog result: ${result}`);
+    });
   }
 
   private saveKey(keyPair) {
-    // sessionStorage['privateKey'] = keyPair.getPrivateKey().toString(16);
-    // let publicKey = keyPair.getPublic().getX().toString(16) + (keyPair.getPublic().getY().isOdd() ? '1' : '0');
-    // sessionStorage['publicKey'] = publicKey;
-    // // let ripemd160 = new Hashes.RMD160();
-    // // sessionStorage['address'] = ripemd160.hex(publicKey);
+    const privateKey = keyPair.getPrivate().toString(16);
+    sessionStorage['privateKey'] = privateKey;
+    const publicKey = keyPair.getPublic().getX().toString(16) + (keyPair.getPublic().getY().isOdd() ? '1' : '0');
+    sessionStorage['publicKey'] = publicKey;
+    const ripemd160 = new hashes.RMD160();
+    const address = ripemd160.hex(publicKey);
+    sessionStorage['address'] = address;
+
+    this.wallet = {
+      privateKey: privateKey,
+      publicKey: publicKey,
+      address: address
+    };
+  }
+}
+
+@Component({
+  selector: 'transaction-content-dialog',
+  templateUrl: './transaction-content-dialog.html',
+})
+export class TransactionContentDialog {
+  constructor(private dialogRef: MatDialogRef<TransactionContentDialog>) {
+
   }
 }

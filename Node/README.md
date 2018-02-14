@@ -1,3 +1,0 @@
-# SoftUniChain
-
-SoftUni Blockchain - Node

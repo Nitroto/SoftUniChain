@@ -6,7 +6,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Faucet", "Faucet\Faucet.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Miner", "Miner\Miner.csproj", "{6CF5E862-FB39-44E8-9377-2E898F132329}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Node", "Node\Node.csproj", "{96E64F23-914E-4D20-A532-A7CF78B723F2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Node", "Node\Node.csproj", "{093E9A79-83F2-428C-AFFD-4FD286827EF2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,9 +26,9 @@ Global
 		{6CF5E862-FB39-44E8-9377-2E898F132329}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6CF5E862-FB39-44E8-9377-2E898F132329}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6CF5E862-FB39-44E8-9377-2E898F132329}.Release|Any CPU.Build.0 = Release|Any CPU
-		{96E64F23-914E-4D20-A532-A7CF78B723F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{96E64F23-914E-4D20-A532-A7CF78B723F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{96E64F23-914E-4D20-A532-A7CF78B723F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{96E64F23-914E-4D20-A532-A7CF78B723F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{093E9A79-83F2-428C-AFFD-4FD286827EF2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{093E9A79-83F2-428C-AFFD-4FD286827EF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{093E9A79-83F2-428C-AFFD-4FD286827EF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{093E9A79-83F2-428C-AFFD-4FD286827EF2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

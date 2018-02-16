@@ -6,12 +6,11 @@ namespace Node.Models
 {
     public class Block
     {
-        private static Block _genesisBlock;
-
         public Block(int index, long difficulty, Address mineBy, string previousBlockHash,
             IList<Transaction> transactions)
         {
             this.Index = index;
+            this.CreatedOn = DateTime.Now;
             this.Difficulty = difficulty;
             this.MineBy = mineBy;
             this.PreviousBlockHash = previousBlockHash;
@@ -31,32 +30,8 @@ namespace Node.Models
         public void GenerateHash()
         {
             this.BlockDataHash = "hardcoded data hash, TODO merkel tree and hashing";
-            this.CreatedOn = DateTime.UtcNow;
             this.Nonce = 1234567890;
             this.BlockHash = "hardcoded block hash - TODO use mining process";
-        }
-
-        public static Block Genesis
-        {
-            get
-            {
-                if (_genesisBlock == null)
-                {
-                    IList<Transaction> transactions = new List<Transaction>()
-                    {
-                        new Transaction{
-                            From = Address.GeneratorAddress,
-                            Amount = 100,
-                            To = new Address("1"),
-                            SenderPublicKey = "hardocoded SenderPublicKey",
-                            SenderSignature = new List<string>{"hardcoded SenderSignatoure", "somee"}
-                        }
-                    };
-                    _genesisBlock = new Block(0, 1, new Address("00"), string.Empty, transactions);
-                }
-
-                return _genesisBlock;
-            }
         }
     }
 }

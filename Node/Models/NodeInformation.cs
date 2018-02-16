@@ -4,7 +4,6 @@
     {
         public string About { get; set; }
         public string Name { get; set; }
-        
         public int Peers { get; set; }
         public int Blocks { get; set; }
         public long ConfirmedTransactions { get; set; }

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Node.Interfaces;
@@ -20,14 +19,14 @@ namespace Node.Controllers
             this._nodeService = nodeService;
         }
         
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetBlock(int index)
+        [HttpGet("{index}")]
+        public IActionResult GetBlock(int index)
         {
             var block = this._nodeService.GetBlock(index);
             
             if (block == null)
             {
-                return NotFound();
+                return NotFound($"Block with index '{index}' not found.");
             }
 
             var blockResource = this._mapper.Map<Block, BlockResource>(block);
@@ -36,8 +35,7 @@ namespace Node.Controllers
         }
         
         [HttpGet]
-        // Shoold return BlockResource
-        public async Task<IActionResult> GetAllBlocks()
+        public IActionResult GetAllBlocks()
         {
             var blocks = this._nodeService.GetAllBlocks();
 
@@ -45,7 +43,5 @@ namespace Node.Controllers
             
             return Ok(blocksResource);
         }
-
-
     }
 }

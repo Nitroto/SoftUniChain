@@ -2,16 +2,14 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore.Query.Internal;
 using Node.Interfaces;
 using Node.Models;
-using Node.Resources;
 
 namespace Node.Services
 {
-    public class NodeService: INodeService
+    public class NodeService : INodeService
     {
+        private static Block _genesisBlock;
         private NodeInformation _nodeInformation;
         private ConcurrentDictionary<string, Peer> _peersByAddress;
         private ConcurrentDictionary<string, Transaction> _confirmedTransactionsByHash;
@@ -30,12 +28,12 @@ namespace Node.Services
             // TODO: decide on the collection type, if list introduce locking
             this._blockchain = new List<Block>();
 
-            ProcessNewBlock(Block.Genesis);
+            this.ProcessGenesisBlock();
         }
 
         public NodeInformation GetNodeInfo()
         {
-            var info = new NodeInformation()
+            NodeInformation info = new NodeInformation()
             {
                 Name = this._nodeInformation.Name,
                 About = this._nodeInformation.About,
@@ -52,20 +50,19 @@ namespace Node.Services
 
         public Block GetBlock(int index)
         {
-            if (index < 0 || index > this._blockchain.Count)
+            if (index < 0 || index >= this._blockchain.Count)
             {
-                throw new Exception($"Block not found[index='{index}']");
+                return null;
             }
 
-            var block = this._blockchain[index];
+            Block block = this._blockchain[index];
 
             return block;
         }
-        
+
 
         public IEnumerable<Block> GetAllBlocks()
         {
-            
             var blocks = this._blockchain;
 
             return blocks.Reverse();
@@ -73,21 +70,29 @@ namespace Node.Services
 
         public Transaction GetTransactionInfo(string hash)
         {
-            throw new System.NotImplementedException();
+            if (this._pendingTransactionsByHash.ContainsKey(hash))
+            {
+                return this._pendingTransactionsByHash[hash];
+            }
+
+            return this._confirmedTransactionsByHash.ContainsKey(hash) ? this._confirmedTransactionsByHash[hash] : null;
         }
 
         public void AddTransaction(Transaction transaction)
         {
-            throw new System.NotImplementedException();
+            string transactionHash = transaction.TransactionHash;
+            if (!this._pendingTransactionsByHash.ContainsKey(transactionHash) &&
+                !this._confirmedTransactionsByHash.ContainsKey(transactionHash))
+            {
+                this._pendingTransactionsByHash.TryAdd(transactionHash, transaction);
+            }
         }
-        
+
         private void ProcessNewBlock(Block block)
         {
-            if (IsBlockValid(block))
-            {
-                UpdateCollections(block);
-                this._blockchain.Add(block);
-            }
+            if (!IsBlockValid(block)) return;
+            this.UpdateCollections(block);
+            this._blockchain.Add(block);
         }
 
         private void UpdateCollections(Block block)
@@ -101,7 +106,7 @@ namespace Node.Services
                 t.To.Amount += t.Amount;
 
                 t.MinedInBlockIndex = block.Index;
-                
+
                 // TODO: What exactly Paid means
                 t.Paid = true;
 
@@ -123,6 +128,25 @@ namespace Node.Services
             // TODO: Validate BlockDataHash
 
             return true;
+        }
+
+        private void ProcessGenesisBlock()
+        {
+            if (_genesisBlock != null) return;
+            IList<Transaction> transactions = new List<Transaction>()
+            {
+                new Transaction
+                {
+                    From = Address.GeneratorAddress,
+                    Amount = 100,
+                    To = new Address("1"),
+                    SenderPublicKey = "hardocoded SenderPublicKey",
+                    SenderSignature = new List<string> {"hardcoded SenderSignatoure", "somee"}
+                }
+            };
+            _genesisBlock = new Block(0, 1, new Address("00"), string.Empty, transactions);
+
+            this.ProcessNewBlock(_genesisBlock);
         }
     }
 }

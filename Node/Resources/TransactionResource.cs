@@ -12,5 +12,6 @@ namespace Node.Resources
         public long Nonce { get; set; }
         public int MinedInBlockIndex { get; set; }
         public bool Paid { get; set; }
+        public string TransactionHash { get; set; }
     }
 }

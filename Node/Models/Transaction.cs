@@ -8,42 +8,29 @@ namespace Node.Models
 {
     public class Transaction
     {
-        private string _transactionHash;
         private string _transactionData;
 
-        public Address From { get; set; }
-        public Address To { get; set; }
+        public Transaction(Address from, Address to, long amount)
+        {
+            this.From = from;
+            this.To = to;
+            this.Amount = amount;
+
+            this.TransactionHash = Crypto.Sha256(TransactionData);
+        }
+
+        public Address From { get; private set; }
+        public Address To { get; private set; }
         public long Amount { get; set; }
         public string SenderPublicKey { get; set; }
         public IList<string> SenderSignature { get; set; }
         public long Nonce { get; set; }
         public int MinedInBlockIndex { get; set; }
         public bool Paid { get; set; }
+        public string TransactionHash { get; private set; }
 
-        public string TransactionData
-        {
-            get
-            {
-                if (this._transactionData == null)
-                {
-                    this._transactionData = $"{{'from': '{From.AddressId}','nonce':{Nonce},'value':'{Amount}','to':'{To.AddressId}'}}";
-                }
-
-                return this._transactionData;
-            }
-        }
-        
-        public string TransactionHash
-        {
-            get
-            {
-                if (this._transactionHash == null)
-                {
-                    this._transactionHash = Crypto.Sha256(TransactionData);
-                }
-
-                return this._transactionHash;
-            }
-        }
+        private string TransactionData => this._transactionData ?? (this._transactionData =
+                                              $"{{'from': '{From.AddressId}','nonce':{Nonce},'value':'{Amount}','to':'{To.AddressId}'}}"
+                                          );
     }
 }

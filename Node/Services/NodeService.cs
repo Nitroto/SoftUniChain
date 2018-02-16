@@ -99,9 +99,6 @@ namespace Node.Services
         {
             foreach (Transaction t in block.Transactions)
             {
-                t.From = t.From;
-                t.To = t.To;
-
                 t.From.Amount -= t.Amount;
                 t.To.Amount += t.Amount;
 
@@ -133,20 +130,19 @@ namespace Node.Services
         private void ProcessGenesisBlock()
         {
             if (_genesisBlock != null) return;
-            IList<Transaction> transactions = new List<Transaction>()
-            {
-                new Transaction
-                {
-                    From = Address.GeneratorAddress,
-                    Amount = 100,
-                    To = new Address("1"),
-                    SenderPublicKey = "hardocoded SenderPublicKey",
-                    SenderSignature = new List<string> {"hardcoded SenderSignatoure", "somee"}
-                }
-            };
+            Transaction t = new Transaction(new Address("0"), new Address("1"), 1);
+            t.SenderPublicKey = "hardocoded SenderPublicKey";
+            t.SenderSignature = new List<string> {"hardcoded SenderSignatoure", "some"};
+
+            IList<Transaction> transactions = new List<Transaction> {t};
+
             _genesisBlock = new Block(0, 1, new Address("00"), string.Empty, transactions);
 
             this.ProcessNewBlock(_genesisBlock);
+        }
+
+        private void AddressGenerator()
+        {
         }
     }
 }

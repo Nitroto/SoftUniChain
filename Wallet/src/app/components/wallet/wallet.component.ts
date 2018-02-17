@@ -1,15 +1,20 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material';
+import { WalletService } from '../../services/wallet.service';
+import { FormControl } from '@angular/forms';
 
 import * as elliptic from 'elliptic';
 import * as hashes from 'jshashes';
 
+
 @Component({
-  selector: 'create',
+  selector: 'wallet',
   templateUrl: './wallet.component.html',
   styleUrls: ['./wallet.component.css']
 })
 export class WalletComponent implements OnInit {
+
+  customSelection = new FormControl(false);
 
   wallet = {
     privateKey: '',
@@ -17,10 +22,12 @@ export class WalletComponent implements OnInit {
     address: ''
   };
 
-  selected = 'option1';
+  user: {};
+
+  node = 'http://127.0.0.1:5000';
   transactionDialog: MatDialogRef<TransactionContentDialog>;
 
-  constructor(public dialog: MatDialog) {
+  constructor(public dialog: MatDialog, private _walletServices: WalletService) {
   }
 
   ngOnInit(): void {
@@ -41,6 +48,7 @@ export class WalletComponent implements OnInit {
     const ec = new elliptic.ec('secp256k1');
     const keyPair = ec.genKeyPair();
     this.saveKey(keyPair);
+    this.loadUserDataFromChain();
   }
 
 
@@ -49,6 +57,7 @@ export class WalletComponent implements OnInit {
     const ec = new elliptic.ec('secp256k1');
     const keyPair = ec.keyFromPrivate(userPrivateKey);
     this.saveKey(keyPair);
+    this.loadUserDataFromChain();
   }
 
   // private dialogRef: MatDialogRef<DialogContentDialog>
@@ -58,13 +67,16 @@ export class WalletComponent implements OnInit {
     console.log('Sign...');
   }
 
+  loadUserDataFromChain() {
+    const clientUrl = `${this.node}/api/address/${this.wallet.address}`;
+    this.user = this._walletServices.getClientData(clientUrl);
+  }
+
   openDialog() {
     this.transactionDialog = this.dialog.open(TransactionContentDialog, {
       hasBackdrop: false,
       height: '350px'
     });
-
-
   }
 
   private sendSignedTransaction() {

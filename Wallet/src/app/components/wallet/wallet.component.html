@@ -31,14 +31,21 @@
 
   <div class="col-5" >
 
-    <mat-form-field class="full-width">
-      <mat-select placeholder="Select node" [(value)]="selected">
-        <mat-option value="option1">node 1</mat-option>
-        <mat-option value="option2">node 2</mat-option>
-        <mat-option value="option3">node 3</mat-option>
-        <mat-option value="option4">node 4</mat-option>
+    <mat-form-field class="full-width" >
+      <mat-select placeholder="Select node" [disabled]="customSelection.value" [(value)]="node">
+        <mat-option value="http://127.0.0.1:5000">localhost:5000</mat-option>
       </mat-select>
     </mat-form-field>
+
+    <p>
+      <mat-checkbox [formControl]='customSelection'>Custom</mat-checkbox>
+    </p>
+
+    <div *ngIf="customSelection.value">
+      <mat-form-field class="full-width"  >
+        <input matInput placeholder="Custom node:" type="text" name="customNode" id="customNode" [(ngModel)]="node" [disabled]="!customSelection.value">
+      </mat-form-field>
+    </div>
 
     <div *ngIf="wallet.address">
       <div class="card text-center">

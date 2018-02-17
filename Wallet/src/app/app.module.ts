@@ -2,9 +2,10 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { RouterModule } from '@angular/router';
+import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
-import { MatDialogModule, MatIconModule, MatSelectModule } from '@angular/material';
+import { MatCheckboxModule, MatDialogModule, MatFormFieldModule, MatIconModule, MatSelectModule} from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastyModule } from 'ng2-toasty';
 import { NgxQRCodeModule} from '@techiediaries/ngx-qrcode';
@@ -13,6 +14,8 @@ import { AppComponent } from './components/app/app.component';
 import { TransactionContentDialog, WalletComponent } from './components/wallet/wallet.component';
 import { HomeComponent } from './components/home/home.component';
 import { NavigationComponent } from './components/navigation/navigation.component';
+import { WalletService } from './services/wallet.service';
+
 
 @NgModule({
   declarations: [
@@ -24,6 +27,7 @@ import { NavigationComponent } from './components/navigation/navigation.componen
   ],
   imports: [
     BrowserModule,
+    HttpClientModule,
     BrowserAnimationsModule,
     FormsModule,
     ReactiveFormsModule,
@@ -32,6 +36,8 @@ import { NavigationComponent } from './components/navigation/navigation.componen
     MatIconModule,
     MatSelectModule,
     MatDialogModule,
+    MatCheckboxModule,
+    MatFormFieldModule,
     NgbModule.forRoot(),
     ToastyModule.forRoot(),
     RouterModule.forRoot([
@@ -45,7 +51,9 @@ import { NavigationComponent } from './components/navigation/navigation.componen
   entryComponents: [
     TransactionContentDialog
   ],
-  providers: [],
+  providers: [
+    WalletService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {

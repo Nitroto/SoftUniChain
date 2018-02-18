@@ -1,4 +1,6 @@
-﻿namespace Node.Models
+﻿using System.Collections.Generic;
+
+namespace Node.Models
 {
     public class Address
     {

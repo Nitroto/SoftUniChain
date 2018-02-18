@@ -36,12 +36,6 @@ namespace Node.Controllers
         [HttpGet]
         public IActionResult GetAllTransactions()
         {
-//            var blocks = this._nodeService.GetAllBlocks();
-//
-//            var blocksResource = this._mapper.Map<IEnumerable<Block>, IEnumerable<BlockResource>>(blocks);
-//            
-//            return Ok(blocksResource);
-
             return Ok();
         }
 

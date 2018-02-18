@@ -15,6 +15,7 @@ namespace Node.Services
         private ConcurrentDictionary<string, Transaction> _confirmedTransactionsByHash;
         private ConcurrentDictionary<string, Transaction> _pendingTransactionsByHash;
         private ConcurrentDictionary<string, Address> _addresses;
+        private ConcurrentDictionary<string, IList<string>> _transactionHashByAddressId;
 
         private IList<Block> _blockchain;
 
@@ -25,6 +26,7 @@ namespace Node.Services
             this._confirmedTransactionsByHash = new ConcurrentDictionary<string, Transaction>();
             this._pendingTransactionsByHash = new ConcurrentDictionary<string, Transaction>();
             this._addresses = new ConcurrentDictionary<string, Address>();
+            this._transactionHashByAddressId = new ConcurrentDictionary<string, IList<string>>();
             // TODO: decide on the collection type, if list introduce locking
             this._blockchain = new List<Block>();
 
@@ -81,11 +83,58 @@ namespace Node.Services
         public void AddTransaction(Transaction transaction)
         {
             string transactionHash = transaction.TransactionHash;
+            
             if (!this._pendingTransactionsByHash.ContainsKey(transactionHash) &&
                 !this._confirmedTransactionsByHash.ContainsKey(transactionHash))
             {
                 this._pendingTransactionsByHash.TryAdd(transactionHash, transaction);
+                if (!this._transactionHashByAddressId.ContainsKey(transaction.From.AddressId))
+                {
+                    this._transactionHashByAddressId.TryAdd(transaction.From.AddressId, new List<string>());
+                }
+                
+                this._transactionHashByAddressId[transaction.From.AddressId].Add(transaction.TransactionHash);
+                
+                if (!this._transactionHashByAddressId.ContainsKey(transaction.To.AddressId))
+                {
+                    this._transactionHashByAddressId.TryAdd(transaction.To.AddressId, new List<string>());
+                }
+                
+                this._transactionHashByAddressId[transaction.To.AddressId].Add(transaction.TransactionHash);
+
+                if (!this._addresses.ContainsKey(transaction.From.AddressId))
+                {
+                    this._addresses.TryAdd(transaction.From.AddressId, transaction.From);
+                }
+                
+                if (!this._addresses.ContainsKey(transaction.To.AddressId))
+                {
+                    this._addresses.TryAdd(transaction.To.AddressId, transaction.To);
+                }
             }
+        }
+
+
+        public Address GetAddress(string id)
+        {
+            if (!this._addresses.ContainsKey(id))
+            {
+                return null;
+            }
+
+            Address address = this._addresses[id];
+
+            return address;
+        }
+
+        public IEnumerable<Address> GetAllAddresses()
+        {
+            return this._addresses.Values.ToArray();
+        }
+
+        public IEnumerable<string> GetTransactionsByAddressId(string addressId)
+        {
+            return this._transactionHashByAddressId.ContainsKey(addressId) ? this._transactionHashByAddressId[addressId].ToArray() : null;
         }
 
         private void ProcessNewBlock(Block block)

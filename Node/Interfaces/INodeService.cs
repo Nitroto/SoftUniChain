@@ -12,6 +12,10 @@ namespace Node.Interfaces
 
         Transaction GetTransactionInfo(string hash);
         void AddTransaction(Transaction transaction);
+        IEnumerable<string> GetTransactionsByAddressId(string addressId);
         // TransactionCreatedVM AddTransaction(TransactionVM transaction)
+        
+        Address GetAddress(string id);
+        IEnumerable<Address> GetAllAddresses();
     }
 }

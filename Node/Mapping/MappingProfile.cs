@@ -13,11 +13,13 @@ namespace Node.Mapping
         {
             // Domain to API Resource
             CreateMap<Block, BlockResource>();
+            CreateMap<Address, AddressResource>();
             CreateMap<Transaction, TransactionResource>();
             CreateMap<NodeInformation, NodeInformationResource>();
 
             // API Resource to Domain
             CreateMap<BlockResource, Block>();
+            CreateMap<AddressResource, Address>();
             CreateMap<TransactionResource, Transaction>();
             CreateMap<NodeInformationResource, NodeInformation>();
         }

@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Linq;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Node.Interfaces;
 using Node.Models;
@@ -49,6 +50,15 @@ namespace Node.Controllers
 
             Transaction transaction = new Transaction(new Address(transactionResource.From),
                 new Address(transactionResource.To), transactionResource.Amount);
+
+            if (this._nodeService.GetTransactionsByAddressId(transaction.From.AddressId) != null)
+            {
+                transaction.Nonce = this._nodeService.GetTransactionsByAddressId(transaction.From.AddressId).Count() + 1;
+            }
+            else
+            {
+                transaction.Nonce = 1;
+            }
             
             this._nodeService.AddTransaction(transaction);
             

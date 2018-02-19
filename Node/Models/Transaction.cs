@@ -30,7 +30,7 @@ namespace Node.Models
         public string TransactionHash { get; private set; }
 
         private string TransactionData => this._transactionData ?? (this._transactionData =
-                                              $"{{'from': '{From.AddressId}','nonce':{Nonce},'value':'{Amount}','to':'{To.AddressId}'}}"
+                                              $"{{'from': '{From.AddressId}','to':'{To.AddressId}','value':'{Amount}','nonce':{Nonce}, 'senderPublicKey':{SenderPublicKey}}}"
                                           );
     }
 }

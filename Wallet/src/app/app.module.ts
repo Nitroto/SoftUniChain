@@ -3,9 +3,11 @@ import { NgModule } from '@angular/core';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { RouterModule } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, PatternValidator, ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
-import { MatCheckboxModule, MatDialogModule, MatFormFieldModule, MatIconModule, MatSelectModule} from '@angular/material';
+import { MatButtonModule, MatCheckboxModule, MatDialogModule,
+          MatExpansionModule, MatFormFieldModule, MatIconModule,
+          MatSelectModule } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastyModule } from 'ng2-toasty';
 import { NgxQRCodeModule} from '@techiediaries/ngx-qrcode';
@@ -32,8 +34,10 @@ import { WalletService } from './services/wallet.service';
     FormsModule,
     ReactiveFormsModule,
     NgxQRCodeModule,
+    MatExpansionModule,
     MatInputModule,
     MatIconModule,
+    MatButtonModule,
     MatSelectModule,
     MatDialogModule,
     MatCheckboxModule,
@@ -52,7 +56,8 @@ import { WalletService } from './services/wallet.service';
     TransactionContentDialog
   ],
   providers: [
-    WalletService
+    WalletService,
+    PatternValidator
   ],
   bootstrap: [AppComponent]
 })

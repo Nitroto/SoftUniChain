@@ -114,7 +114,6 @@ namespace Node.Services
             }
         }
 
-
         public Address GetAddress(string id)
         {
             if (!this._addresses.ContainsKey(id))
@@ -160,11 +159,6 @@ namespace Node.Services
                 this._pendingTransactionsByHash.TryRemove(t.TransactionHash, out var Ignore);
             }
         }
-
-//        private Address GetOrAddAddress(string address)
-//        {
-//            return GetOrAddAddress(new Address(address));
-//        }
 
         private bool IsBlockValid(Block block)
         {

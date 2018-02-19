@@ -1,37 +1,47 @@
 <div class="row">
-  <div class="container col-5 float-left">
-    <h1>Create or load wallet</h1>
-    <p>To generate a new wallet just press <b>Generate New</b> button and you will receive random private key, public key and address.</p>
-    <p>To load your wallet enter your wallet private key (compressed ECDSA key, 65 hex digits) and press <b>Load</b> button.</p>
-    <form class="wallet-form">
-      <mat-form-field class="full-width">
-        <textarea matInput placeholder="Private key:" name="privateKey" id="privateKey" [(ngModel)]="wallet.privateKey"
-                  #privateKey="ngModel" required pattern="^[A-Za-z0-9]{64}$">
-        </textarea>
-      </mat-form-field>
+  <div class="container">
+    <mat-accordion class="full-width">
+      <mat-expansion-panel [expanded]="!wallet.privateKey">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <b>Create or load wallet</b>
+          </mat-panel-title>
+          <mat-panel-description>
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+        <p>To generate a new wallet just press <b>Generate New</b> button and you will receive random private key,
+          public key and address.</p>
+        <p>To load your wallet enter your wallet private key (compressed ECDSA key, 65 hex digits) and press <b>Load</b>
+          button.</p>
 
-      <mat-form-field class="full-width">
+        <form class="wallet-form">
+          <mat-form-field class="full-width">
+        <textarea matInput placeholder="Private key:" name="privateKey" id="privateKey" [(ngModel)]="wallet.privateKey"
+                  #privateKey="ngModel" required [pattern]="privateKeyPattern">
+        </textarea>
+          </mat-form-field>
+
+          <mat-form-field class="full-width">
         <textarea matInput placeholder="Public key:" name="publicKey" id="publicKey"
                   [(ngModel)]="wallet.publicKey"></textarea>
-      </mat-form-field>
+          </mat-form-field>
 
-      <mat-form-field class="full-width">
-        <textarea matInput placeholder="Address:" name="address" id="address" [(ngModel)]="wallet.address"></textarea>
-      </mat-form-field>
+          <mat-form-field class="full-width">
+            <textarea matInput placeholder="Address:" name="address" id="address"
+                      [(ngModel)]="wallet.address"></textarea>
+          </mat-form-field>
 
-      <button class="btn btn-success" (click)="generateNewWallet()">Generate New</button>
-      <button class="btn btn-primary" (click)="loadWallet()"
-              [disabled]="!privateKey.hasError('pattern') && !privateKey.hasError('required')">Load
-      </button>
-    </form>
+          <button mat-raised-button color="primary" (click)="generateNewWallet()">Generate New</button>
+          <button mat-raised-button color="accent" (click)="loadWallet()"
+                  [disabled]="privateKey.errors?.pattern || privateKey.errors?.required">Load Wallet
+          </button>
+        </form>
+      </mat-expansion-panel>
+    </mat-accordion>
 
     <div class="addSomeSpace"></div>
 
-  </div>
-
-  <div class="col-5" >
-
-    <mat-form-field class="full-width" >
+    <mat-form-field class="full-width">
       <mat-select placeholder="Select node" [disabled]="customSelection.value" [(value)]="node">
         <mat-option value="http://127.0.0.1:5000">localhost:5000</mat-option>
       </mat-select>
@@ -42,8 +52,9 @@
     </p>
 
     <div *ngIf="customSelection.value">
-      <mat-form-field class="full-width"  >
-        <input matInput placeholder="Custom node:" type="text" name="customNode" id="customNode" [(ngModel)]="node" [disabled]="!customSelection.value">
+      <mat-form-field class="full-width">
+        <input matInput placeholder="Custom node:" type="text" name="customNode" id="customNode" [(ngModel)]="node"
+               [disabled]="!customSelection.value">
       </mat-form-field>
     </div>
 
@@ -55,31 +66,37 @@
           qrc-version="5">
         </ngx-qrcode>
         <div class="card-block">
-          <h3 class="card-title">Your balance: <b>0 SUC</b></h3>
+          <h3 class="card-title">Your balance: <b>{{0| currency:'SUC':'.2-5'}}</b></h3>
           <p class="card-text">{{ wallet.address }}</p>
         </div>
       </div>
 
       <div class="addSomeSpace"></div>
 
-      <form class="send-form">
+      <form #f="ngForm" (ngSubmit)="signTransaction()" class="send-form">
         <mat-form-field class="full-width">
-          <textarea matInput placeholder="Sender:" name="sender" id="sender" [(ngModel)]="wallet.address" disabled></textarea>
+          <textarea matInput placeholder="Sender:" name="sender" id="sender" [(ngModel)]="transaction.from"
+                    disabled></textarea>
         </mat-form-field>
 
         <mat-form-field class="full-width">
-          <textarea matInput placeholder="Recipient:" name="recipient" id="recipient" [(ngModel)]="recipient" required></textarea>
+          <textarea matInput placeholder="Recipient:" name="recipient" id="recipient" #recipient="ngModel"
+                    [(ngModel)]="transaction.to" [pattern]="addressPattern" required></textarea>
         </mat-form-field>
 
         <mat-form-field class="full-width">
           <input matInput placeholder="Amount:" type="number" name="amount" id="amount"
-                 [(ngModel)]="amount" required>
-          <span matPrefix>$&nbsp;</span>
+                 [(ngModel)]="transaction.amount" required>
+          <span matPrefix><mat-icon>monetization_on</mat-icon>&nbsp;</span>
         </mat-form-field>
 
-        <button class="btn btn-success" (click)="signTransaction()" [disabled]="!recipient">Sign</button>
+        <button mat-raised-button color="primary"
+                [disabled]="(!transaction.to || recipient.errors?.pattern) || transaction.amount <= 0">
+          <mat-icon color="basic">fingerprint</mat-icon>
+          Sign Transaction
+        </button>
       </form>
     </div>
-    </div>
-
+  </div>
 </div>
+

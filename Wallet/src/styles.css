@@ -42,3 +42,6 @@ textarea {
   padding-bottom: 2em;
 }
 
+md-icon{
+  font-family: 'Material Icons' !important;
+}

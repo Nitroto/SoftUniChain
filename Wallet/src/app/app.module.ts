@@ -6,8 +6,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, PatternValidator, ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule, MatCheckboxModule, MatDialogModule,
-          MatExpansionModule, MatFormFieldModule, MatIconModule,
-          MatSelectModule } from '@angular/material';
+  MatExpansionModule, MatFormFieldModule, MatGridListModule,
+  MatIconModule, MatSelectModule } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastyModule } from 'ng2-toasty';
 import { NgxQRCodeModule} from '@techiediaries/ngx-qrcode';
@@ -35,6 +35,7 @@ import { WalletService } from './services/wallet.service';
     ReactiveFormsModule,
     NgxQRCodeModule,
     MatExpansionModule,
+    MatGridListModule,
     MatInputModule,
     MatIconModule,
     MatButtonModule,

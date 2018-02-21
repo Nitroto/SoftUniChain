@@ -33,6 +33,15 @@ namespace Node
             services.AddSingleton<ITransactionService, TransactionService>();
             
             services.AddAutoMapper();
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllOrigins",
+                    builder =>
+                    {
+                        builder.AllowAnyOrigin();
+                    });
+            });
             
             services.AddMvc();
 

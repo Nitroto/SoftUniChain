@@ -42,7 +42,7 @@
   <div class="container col-md-6">
     <mat-form-field class="full-width">
       <mat-select placeholder="Select node" [disabled]="customSelection.value" [(value)]="node">
-        <mat-option value="http://127.0.0.1:5000">localhost:5000</mat-option>
+        <mat-option value="http://localhost:5000">localhost:5000</mat-option>
       </mat-select>
     </mat-form-field>
 
@@ -50,10 +50,11 @@
       <mat-checkbox [formControl]='customSelection'>Custom</mat-checkbox>
     </p>
 
-    <mat-form-field class="full-width">
-      <input matInput placeholder="Custom node:" type="text" name="customNode" id="customNode" [(ngModel)]="node"
-             [disabled]="!customSelection.value">
-    </mat-form-field>
+    <div *ngIf="customSelection.value">
+      <mat-form-field class="full-width" >
+        <input matInput placeholder="Custom node:" type="text" name="customNode" id="customNode" [(ngModel)]="node">
+      </mat-form-field>
+    </div>
 
     <div class="card text-center">
       <ngx-qrcode

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Node.Interfaces;
@@ -43,6 +44,7 @@ namespace Node.Controllers
         [HttpPost]
         public IActionResult AddTransaction([FromBody]TransactionResource transactionResource)
         {
+            Console.WriteLine(transactionResource);
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);

@@ -5,6 +5,7 @@ import { FormControl } from '@angular/forms';
 
 import * as elliptic from 'elliptic';
 import * as hashes from 'jshashes';
+import * as utf8 from 'utf8';
 
 
 @Component({
@@ -15,7 +16,6 @@ import * as hashes from 'jshashes';
 export class WalletComponent implements OnInit {
 
   customSelection = new FormControl(false);
-  showGenerateLoadSection = true;
   privateKeyPattern = '^[A-Za-z0-9]{64}$';
   addressPattern = '^[A-Za-z0-9]{40}$';
 
@@ -33,8 +33,7 @@ export class WalletComponent implements OnInit {
 
   user: {};
 
-  node = 'http://127.0.0.1:5000';
-  transactionDialog: MatDialogRef<TransactionContentDialog>;
+  node = 'http://localhost:5000';
 
   constructor(public dialog: MatDialog, private _walletServices: WalletService) {
   }
@@ -71,31 +70,38 @@ export class WalletComponent implements OnInit {
     this.loadUserDataFromChain();
   }
 
-  // private dialogRef: MatDialogRef<DialogContentDialog>
-
   loadUserDataFromChain() {
-    const clientUrl = `${this.node}/api/address/${this.wallet.address}`;
+    const clientUrl = this.node + '/api/address/' + this.wallet.address;
     this.user = this._walletServices.getClientData(clientUrl);
   }
 
-
-
   signTransaction(): void {
-    const data = {};
-    this.openDialog();
-    console.log('Sign...');
+    const transactionPayLoad = {
+      'from': this.transaction.from,
+      'to': this.transaction.to,
+      'senderPublicKey': this.wallet.publicKey,
+      'amount': this.transaction.amount,
+      'dataCreated': new Date().toISOString()
+    };
+    const transactionPayLoadAsString = JSON.stringify(transactionPayLoad).toString();
+    const transactionPayloadHash = new hashes.SHA256().hex_hmac(utf8.encode(transactionPayLoadAsString));
+    const privateKey = new elliptic.ec('secp256k1').keyFromPrivate(this.wallet.privateKey);
+    const transactionSignature = privateKey.sign(transactionPayloadHash);
+    const senderSignature = [transactionSignature.r.toString(16), transactionSignature.s.toString(16)];
+    const data = transactionPayLoad;
+    data['senderSignature'] = senderSignature;
+    this.openSigningDialog(data);
   }
 
-  private sendSignedTransaction() {
-    this.transactionDialog.afterClosed().subscribe(result => {
-      console.log(`Dialog result: ${result}`);
-    });
-  }
-
-  private openDialog() {
-    this.transactionDialog = this.dialog.open(TransactionContentDialog, {
-      data: {'from': this.transaction.from, 'to': this.transaction.to, 'amount': this.transaction.amount},
-
+  private openSigningDialog(data) {
+    const transactionDialog = this.dialog.open(TransactionContentDialog, {data: data});
+    transactionDialog.afterClosed().subscribe(result => {
+      if (result) {
+        const address = this.node + '/api/transactions';
+        this._walletServices.sendSigntTransaction(address, data).subscribe(result =>{
+          console.log(result);
+        });
+      }
     });
   }
 

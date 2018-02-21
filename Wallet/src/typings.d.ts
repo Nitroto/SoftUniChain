@@ -6,3 +6,4 @@ interface NodeModule {
 
 declare module 'elliptic';
 declare module 'jshashes';
+declare module 'utf8';

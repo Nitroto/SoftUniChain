@@ -34,6 +34,7 @@ export class WalletComponent implements OnInit {
   user: {};
 
   node = 'http://localhost:5000';
+  info$: any;
 
   constructor(public dialog: MatDialog, private _walletServices: WalletService) {
   }
@@ -52,6 +53,12 @@ export class WalletComponent implements OnInit {
       this.wallet.address = sessionStorage['address'];
       this.transaction.from = sessionStorage['address'];
     }
+  }
+
+  getNodeInfo() {
+    let address = 'http://localhost:5000/api/info';
+    this._walletServices.getInfo(address).subscribe(r => console.log(r));
+    this.info$ = this._walletServices.getInfo(address);
   }
 
   generateNewWallet() {

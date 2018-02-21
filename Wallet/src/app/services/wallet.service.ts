@@ -13,4 +13,8 @@ export class WalletService {
   sendSigntTransaction(address, transaction) {
     return this._http.post(address, JSON.stringify(transaction));
   }
+
+  getInfo(address) {
+    return this._http.get(address);
+  }
 }

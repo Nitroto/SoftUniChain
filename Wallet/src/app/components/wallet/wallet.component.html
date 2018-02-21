@@ -1,3 +1,9 @@
+<button mat-raised-button color="primary" (click)="getNodeInfo()">Get Info</button>
+
+<div *ngIf="info$ | async as node">
+  {{node | json}}
+</div>
+
 <mat-accordion class="full-width">
   <mat-expansion-panel [expanded]="!wallet.privateKey">
     <mat-expansion-panel-header>

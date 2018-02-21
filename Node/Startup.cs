@@ -33,15 +33,8 @@ namespace Node
             services.AddSingleton<ITransactionService, TransactionService>();
             
             services.AddAutoMapper();
-
-            services.AddCors(options =>
-            {
-                options.AddPolicy("AllowAllOrigins",
-                    builder =>
-                    {
-                        builder.AllowAnyOrigin();
-                    });
-            });
+            
+            services.AddCors();
             
             services.AddMvc();
 
@@ -76,6 +69,9 @@ namespace Node
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "SoftUni Blockchain Node V1");
             });
 
+            app.UseCors(
+                options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()
+                );
             
             app.UseMvc();
         }

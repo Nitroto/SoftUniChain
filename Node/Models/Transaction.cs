@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Security.Cryptography;
@@ -20,10 +21,11 @@ namespace Node.Models
         }
 
         public Address From { get; private set; }
-        public Address To { get; private set; }
-        public long Amount { get; set; }
+        public Address To { get; private set; }        
         public string SenderPublicKey { get; set; }
-        public IList<string> SenderSignature { get; set; }
+        public long Amount { get; set; }
+        public DateTime DateCreated { get; set; }
+        public IEnumerable<string> SenderSignature { get; set; }
         public long Nonce { get; set; }
         public int MinedInBlockIndex { get; set; }
         public bool Paid { get; set; }

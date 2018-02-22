@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Node.Resources
 {
@@ -6,9 +7,10 @@ namespace Node.Resources
     {
         public string From { get; set; }
         public string To { get; set; }
-        public long Amount { get; set; }
         public string SenderPublicKey { get; set; }
-        public IList<string> SenderSignature { get; set; }
+        public long Amount { get; set; }
+        public DateTime DateCreated { get; set; }
+        public IEnumerable<string> SenderSignature { get; set; }
         public long Nonce { get; set; }
         public int MinedInBlockIndex { get; set; }
         public bool Paid { get; set; }

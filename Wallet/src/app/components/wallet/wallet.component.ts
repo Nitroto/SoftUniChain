@@ -56,8 +56,7 @@ export class WalletComponent implements OnInit {
   }
 
   getNodeInfo() {
-    let address = 'http://localhost:5000/api/info';
-    this._walletServices.getInfo(address).subscribe(r => console.log(r));
+    let address = this.node + '/api/info';
     this.info$ = this._walletServices.getInfo(address);
   }
 
@@ -67,7 +66,6 @@ export class WalletComponent implements OnInit {
     this.saveKey(keyPair);
     this.loadUserDataFromChain();
   }
-
 
   loadWallet() {
     const userPrivateKey = this.wallet.privateKey;
@@ -88,7 +86,7 @@ export class WalletComponent implements OnInit {
       'to': this.transaction.to,
       'senderPublicKey': this.wallet.publicKey,
       'amount': this.transaction.amount,
-      'dataCreated': new Date().toISOString()
+      'dateCreated': new Date().toISOString()
     };
     const transactionPayLoadAsString = JSON.stringify(transactionPayLoad).toString();
     const transactionPayloadHash = new hashes.SHA256().hex_hmac(utf8.encode(transactionPayLoadAsString));
@@ -105,7 +103,8 @@ export class WalletComponent implements OnInit {
     transactionDialog.afterClosed().subscribe(result => {
       if (result) {
         const address = this.node + '/api/transactions';
-        this._walletServices.sendSigntTransaction(address, data).subscribe(result =>{
+        data['transactionHash'] = new hashes.SHA256().hex_hmac(utf8.encode(JSON.stringify(data).toString()));
+        this._walletServices.sendSigntTransaction(address, data).subscribe(result => {
           console.log(result);
         });
       }

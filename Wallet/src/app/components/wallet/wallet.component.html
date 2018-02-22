@@ -74,34 +74,41 @@
         <h3 class="card-title">Your balance: <b>{{0| currency:'SUC':'.2-5'}}</b></h3>
         <p class="card-text">{{ wallet.address }}</p>
       </div>
+
+      <div *ngIf="user$ | async as user">
+        <p>{{ user | json }}</p>
+      </div>
     </div>
   </div>
 
   <div class="container col-md-6">
     <mat-form-field class="full-width">
-      <input matInput type="text" placeholder="Sender:" name="sender" id="sender" [(ngModel)]="transaction.from"
+      <input matInput type="text" placeholder="Sender" name="sender" id="sender" [(ngModel)]="transaction.from"
              disabled>
     </mat-form-field>
 
     <form #f="ngForm" (ngSubmit)="signTransaction(f)" class="send-form">
       <mat-form-field class="full-width">
-          <input matInput type="text" placeholder="Recipient:" name="recipient" id="recipient" #recipient="ngModel"
+          <input matInput type="text" placeholder="Recipient" name="recipient" id="recipient" #recipient="ngModel"
                     [(ngModel)]="transaction.to" [pattern]="addressPattern" required>
       </mat-form-field>
 
       <mat-form-field class="full-width">
-        <input matInput type="text" placeholder="Amount:" type="number" name="amount" id="amount"
-               [(ngModel)]="transaction.amount" required>
-        <span matPrefix><mat-icon>monetization_on</mat-icon>&nbsp;</span>
+        <input matInput placeholder="Amount" type="number" name="value" id="value" [(ngModel)]="transaction.value" required>
+        <span matPrefix><mat-icon>monetization_on</mat-icon></span>
+      </mat-form-field>
+
+      <mat-form-field class="full-width">
+        <input matInput placeholder="Fee" type="number" name="fee" id="fee" [(ngModel)]="transaction.fee">
+        <span matPrefix>&mu;&nbsp;&nbsp;</span>
       </mat-form-field>
 
       <button mat-raised-button color="primary"
-              [disabled]="(!transaction.to || recipient.errors?.pattern) || transaction.amount <= 0">
+              [disabled]="(!transaction.to || recipient.errors?.pattern) || transaction.value <= 0">
         <mat-icon color="basic">fingerprint</mat-icon>
         Sign Transaction
       </button>
     </form>
-
   </div>
 </div>
 

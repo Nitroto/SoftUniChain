@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using System.Net.Sockets;
 using System.Security.Cryptography;
 using Node.Utilities;
@@ -9,30 +10,18 @@ namespace Node.Models
 {
     public class Transaction
     {
+        private const int FEE = 20;
         private string _transactionData;
-
-        public Transaction(Address from, Address to, long amount)
-        {
-            this.From = from;
-            this.To = to;
-            this.Amount = amount;
-
-            this.TransactionHash = Crypto.Sha256(TransactionData);
-        }
 
         public Address From { get; private set; }
         public Address To { get; private set; }        
-        public string SenderPublicKey { get; set; }
-        public long Amount { get; set; }
+        public long Value { get; set; }
+        public int Fee { get; set; }
         public DateTime DateCreated { get; set; }
+        public string SenderPublicKey { get; set; }
         public IEnumerable<string> SenderSignature { get; set; }
-        public long Nonce { get; set; }
-        public int MinedInBlockIndex { get; set; }
-        public bool Paid { get; set; }
         public string TransactionHash { get; private set; }
-
-        private string TransactionData => this._transactionData ?? (this._transactionData =
-                                              $"{{'from': '{From.AddressId}','to':'{To.AddressId}','value':'{Amount}','nonce':{Nonce}, 'senderPublicKey':{SenderPublicKey}}}"
-                                          );
+        public int? MinedInBlockIndex { get; set; }
+        public bool TransferSuccessfull { get; set; }
     }
 }

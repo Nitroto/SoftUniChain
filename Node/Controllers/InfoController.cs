@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Node.Interfaces;
 using Node.Models;
@@ -26,5 +27,10 @@ namespace Node.Controllers
 
             return Ok(infoResource);
         }
+
+//        [HttpGet]
+//        public IActionResult GetAdditionalInformation(string query)
+//        {
+//        }
     }
 }

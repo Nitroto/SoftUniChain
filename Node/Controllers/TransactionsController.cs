@@ -44,28 +44,16 @@ namespace Node.Controllers
         [HttpPost]
         public IActionResult AddTransaction([FromBody]TransactionResource transactionResource)
         {
-            Console.WriteLine(transactionResource);
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            Transaction transaction = new Transaction(new Address(transactionResource.From),
-                new Address(transactionResource.To), transactionResource.Amount);
-
-            if (this._nodeService.GetTransactionsByAddressId(transaction.From.AddressId) != null)
-            {
-                transaction.Nonce = this._nodeService.GetTransactionsByAddressId(transaction.From.AddressId).Count() + 1;
-            }
-            else
-            {
-                transaction.Nonce = 1;
-            }
+            Transaction transaction = this._mapper.Map<TransactionResource, Transaction>(transactionResource);
             
             this._nodeService.AddTransaction(transaction);
-            
-            var result = this._mapper.Map<Transaction, TransactionResource>(transaction);
-            return Ok(result);
+
+            return Ok(transactionResource);
         }
     }
 }

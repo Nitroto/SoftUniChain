@@ -1,12 +1,12 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, DoCheck, Inject, OnInit} from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material';
 import { WalletService } from '../../services/wallet.service';
-import {FormControl, FormGroup, NgForm} from '@angular/forms';
+import { FormControl, NgForm } from '@angular/forms';
 
 import * as elliptic from 'elliptic';
 import * as hashes from 'jshashes';
 import * as utf8 from 'utf8';
-import {Observable} from 'rxjs/Observable';
+import { Observable } from 'rxjs/Observable';
 
 
 @Component({
@@ -14,7 +14,7 @@ import {Observable} from 'rxjs/Observable';
   templateUrl: './wallet.component.html',
   styleUrls: ['./wallet.component.css']
 })
-export class WalletComponent implements OnInit {
+export class WalletComponent implements OnInit, DoCheck {
 
   customSelection = new FormControl(false);
   privateKeyPattern = '^[A-Za-z0-9]{64}$';
@@ -29,14 +29,14 @@ export class WalletComponent implements OnInit {
   transaction = {
     from: '',
     to: '',
-    amount: 0.00000
+    value: 0,
+    fee: 20,
   };
-
-  user: {};
 
   node = 'http://localhost:5000';
   info$: any;
   transactions$: any;
+  user$: any;
 
   constructor(public dialog: MatDialog, private _walletServices: WalletService) {
   }
@@ -44,7 +44,6 @@ export class WalletComponent implements OnInit {
   ngOnInit(): void {
     if (sessionStorage['privateKey']) {
       this.wallet.privateKey = sessionStorage['privateKey'];
-
     }
 
     if (sessionStorage['privateKey']) {
@@ -54,11 +53,16 @@ export class WalletComponent implements OnInit {
     if (sessionStorage['address']) {
       this.wallet.address = sessionStorage['address'];
       this.transaction.from = sessionStorage['address'];
+      this.user$ = this.loadUserDataFromChain();
     }
   }
 
+  ngDoCheck(): void {
+  }
+
+
   getNodeInfo(): void {
-    let address = this.node + '/api/info';
+    const address = this.node + '/api/info';
     this.info$ = this._walletServices.getData(address);
   }
 
@@ -66,7 +70,7 @@ export class WalletComponent implements OnInit {
     const ec = new elliptic.ec('secp256k1');
     const keyPair = ec.genKeyPair();
     this.saveKey(keyPair);
-    this.loadUserDataFromChain();
+    this.user$ = this.loadUserDataFromChain();
   }
 
   loadWallet(): void {
@@ -74,12 +78,12 @@ export class WalletComponent implements OnInit {
     const ec = new elliptic.ec('secp256k1');
     const keyPair = ec.keyFromPrivate(userPrivateKey);
     this.saveKey(keyPair);
-    this.loadUserDataFromChain();
+    this.user$ = this.loadUserDataFromChain();
   }
 
-  loadUserDataFromChain(): void {
-    const clientUrl = this.node + '/api/address/' + this.wallet.address;
-    this.user = this._walletServices.getData(clientUrl);
+  loadUserDataFromChain(): Observable<any> {
+    const address = this.node + '/api/addresses/' + this.wallet.address;
+    return this._walletServices.getData(address);
   }
 
   signTransaction(form: NgForm): void {
@@ -87,7 +91,8 @@ export class WalletComponent implements OnInit {
       'from': this.transaction.from,
       'to': this.transaction.to,
       'senderPublicKey': this.wallet.publicKey,
-      'amount': this.transaction.amount,
+      'value': this.transaction.value * 1000000,
+      'fee': this.transaction.fee,
       'dateCreated': new Date().toISOString()
     };
     const transactionPayLoadAsString = JSON.stringify(transactionPayLoad).toString();
@@ -102,13 +107,16 @@ export class WalletComponent implements OnInit {
         const address = this.node + '/api/transactions';
         data['transactionHash'] = new hashes.SHA256().hex_hmac(utf8.encode(JSON.stringify(data).toString()));
         this._walletServices.sendSigntTransaction(address, data);
-        form.resetForm();
+        form.controls['recipient'].reset();
+        form.controls['recipient'].clearValidators();
+        form.controls['value'].reset();
+        form.controls['value'].clearValidators();
       }
     });
   }
 
   private getUserTransactions() {
-    
+
   }
 
   private openSigningDialog(data): Observable<any> {

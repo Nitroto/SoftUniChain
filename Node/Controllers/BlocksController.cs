@@ -22,14 +22,14 @@ namespace Node.Controllers
         [HttpGet("{index}")]
         public IActionResult GetBlock(int index)
         {
-            var block = this._nodeService.GetBlock(index);
+            Block block = this._nodeService.GetBlock(index);
             
             if (block == null)
             {
                 return NotFound($"Block with index '{index}' not found.");
             }
 
-            var blockResource = this._mapper.Map<Block, BlockResource>(block);
+            BlockResource blockResource = this._mapper.Map<Block, BlockResource>(block);
             
             return Ok(blockResource);
         }
@@ -37,9 +37,9 @@ namespace Node.Controllers
         [HttpGet]
         public IActionResult GetAllBlocks()
         {
-            var blocks = this._nodeService.GetAllBlocks();
+            IEnumerable<Block> blocks = this._nodeService.GetAllBlocks();
 
-            var blocksResource = this._mapper.Map<IEnumerable<Block>, IEnumerable<BlockResource>>(blocks);
+            IEnumerable<BlockResource> blocksResource = this._mapper.Map<IEnumerable<Block>, IEnumerable<BlockResource>>(blocks);
             
             return Ok(blocksResource);
         }

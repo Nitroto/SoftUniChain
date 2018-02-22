@@ -16,6 +16,7 @@ namespace Node.Services
         private ConcurrentDictionary<string, Transaction> _pendingTransactionsByHash;
         private ConcurrentDictionary<string, Address> _addresses;
         private ConcurrentDictionary<string, IList<string>> _transactionHashByAddressId;
+        private ConcurrentDictionary<string, Block> _miningJobs;
 
         private IList<Block> _blockchain;
 
@@ -27,6 +28,7 @@ namespace Node.Services
             this._pendingTransactionsByHash = new ConcurrentDictionary<string, Transaction>();
             this._addresses = new ConcurrentDictionary<string, Address>();
             this._transactionHashByAddressId = new ConcurrentDictionary<string, IList<string>>();
+            this._miningJobs = new ConcurrentDictionary<string, Block>();
             // TODO: decide on the collection type, if list introduce locking
             this._blockchain = new List<Block>();
 
@@ -147,13 +149,13 @@ namespace Node.Services
         {
             foreach (Transaction t in block.Transactions)
             {
-                t.From.Amount -= t.Amount;
-                t.To.Amount += t.Amount;
+                t.From.Amount -= t.Value;
+                t.To.Amount += t.Value;
 
                 t.MinedInBlockIndex = block.Index;
 
                 // TODO: What exactly Paid means
-                t.Paid = true;
+                t.TransferSuccessfull = true;
 
                 this._confirmedTransactionsByHash.TryAdd(t.TransactionHash, t);
                 this._pendingTransactionsByHash.TryRemove(t.TransactionHash, out var Ignore);
@@ -173,9 +175,7 @@ namespace Node.Services
         private void ProcessGenesisBlock()
         {
             if (_genesisBlock != null) return;
-            Transaction t = new Transaction(new Address("0"), new Address("1"), 1);
-            t.SenderPublicKey = "hardocoded SenderPublicKey";
-            t.SenderSignature = new List<string> {"hardcoded SenderSignatoure", "some"};
+            Transaction t = new Transaction();
 
             IList<Transaction> transactions = new List<Transaction> {t};
 

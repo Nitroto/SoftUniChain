@@ -8,6 +8,7 @@
         public int Blocks { get; set; }
         public long ConfirmedTransactions { get; set; }
         public long PendingTransactions { get; set; }
+        public int CommulativeDificulty { get; set; }
         public int Addresses { get; set; }
         public long Coins { get; set; }
     }

@@ -1,15 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import {Observable} from 'rxjs/Observable';
-import {RequestOptions} from '@angular/http';
+import { Observable } from 'rxjs/Observable';
 
 @Injectable()
 export class WalletService {
   constructor(private _http: HttpClient) { }
 
 
-  getClientData(clientAddress): Observable<any> {
-    return this._http.get(clientAddress);
+  getData(address): Observable<any> {
+    return this._http.get(address);
   }
 
   sendSigntTransaction(address, transaction): Observable<any> {
@@ -18,9 +17,5 @@ export class WalletService {
     const options = { headers: headers };
 
     return this._http.post(address, data, options);
-  }
-
-  getInfo(address): Observable<any> {
-    return this._http.get(address);
   }
 }

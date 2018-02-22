@@ -106,7 +106,7 @@ export class WalletComponent implements OnInit, DoCheck {
       if (result) {
         const address = this.node + '/api/transactions';
         data['transactionHash'] = new hashes.SHA256().hex_hmac(utf8.encode(JSON.stringify(data).toString()));
-        this._walletServices.sendSigntTransaction(address, data);
+        this.transactions$ = this._walletServices.sendSigntTransaction(address, data);
         form.controls['recipient'].reset();
         form.controls['recipient'].clearValidators();
         form.controls['value'].reset();

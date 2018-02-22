@@ -13,11 +13,13 @@ namespace Node.Controllers
     {
         private readonly IMapper _mapper;
         private readonly INodeService _nodeService;
+        private readonly ITransactionService _transactionService;
 
-        public TransactionsController(IMapper mapper, INodeService nodeService)
+        public TransactionsController(IMapper mapper, INodeService nodeService, ITransactionService transactionService)
         {
             this._mapper = mapper;
             this._nodeService = nodeService;
+            this._transactionService = transactionService;
         }
 
         [HttpGet("{hash}")]
@@ -49,7 +51,19 @@ namespace Node.Controllers
                 return BadRequest(ModelState);
             }
 
-            Transaction transaction = this._mapper.Map<TransactionResource, Transaction>(transactionResource);
+            Transaction transaction = new Transaction
+            {
+                From = new Address(transactionResource.From),
+                To = new Address(transactionResource.To),
+                Value = transactionResource.Value,
+                Fee = transactionResource.Fee,
+                SenderPublicKey = transactionResource.SenderPublicKey,
+                DateCreated = transactionResource.DateCreated,
+                TransactionHash = transactionResource.TransactionHash
+            };
+//            Transaction transaction = this._mapper.Map<TransactionResource, Transaction>(transactionResource);
+
+            bool validTransaction = this._transactionService.Validate(transaction);
             
             this._nodeService.AddTransaction(transaction);
 

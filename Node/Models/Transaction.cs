@@ -13,14 +13,14 @@ namespace Node.Models
         private const int FEE = 20;
         private string _transactionData;
 
-        public Address From { get; private set; }
-        public Address To { get; private set; }        
+        public Address From { get; set; }
+        public Address To { get; set; }        
         public long Value { get; set; }
         public int Fee { get; set; }
         public DateTime DateCreated { get; set; }
         public string SenderPublicKey { get; set; }
         public IEnumerable<string> SenderSignature { get; set; }
-        public string TransactionHash { get; private set; }
+        public string TransactionHash { get; set; }
         public int? MinedInBlockIndex { get; set; }
         public bool TransferSuccessfull { get; set; }
     }

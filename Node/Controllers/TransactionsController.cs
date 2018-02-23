@@ -64,7 +64,12 @@ namespace Node.Controllers
 //            Transaction transaction = this._mapper.Map<TransactionResource, Transaction>(transactionResource);
 
             bool validTransaction = this._transactionService.Validate(transaction);
-            
+
+            if (!validTransaction)
+            {
+                return BadRequest("Invalid transaction.");
+            }
+
             this._nodeService.AddTransaction(transaction);
 
             return Ok(transactionResource);

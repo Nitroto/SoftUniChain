@@ -4,9 +4,16 @@ using System.Text;
 using Newtonsoft.Json;
 using Node.Interfaces;
 using Node.Models;
+using Org.BouncyCastle.Asn1.BC;
+using Org.BouncyCastle.Asn1.Ocsp;
+using Org.BouncyCastle.Asn1.Sec;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Digests;
+using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.Math;
+using Org.BouncyCastle.Math.EC;
 using Org.BouncyCastle.Security;
+using Org.BouncyCastle.Utilities.Encoders;
 
 namespace Node.Services
 {
@@ -41,27 +48,28 @@ namespace Node.Services
             string transactionPayLoadAsString = JsonConvert.SerializeObject(transactionData).Replace(" ", "");
             string transactionHash = BytesToHex(CalcSha256(transactionPayLoadAsString));
 
-//            if (transactionHash != transaction.TransactionHash)
-//            {
-//                return false;
-//            }
+            if (transactionHash != transaction.TransactionHash)
+            {
+                return false;
+            }
 
             // validate signature???
-            return VerifySignature(transaction.SenderPublicKey, transactionPayLoadAsString, transaction.SenderSignature);
+            bool result = VerifySignature(transaction.SenderPublicKey, transactionPayLoadAsString, transaction.SenderSignature);
+            return result;
         }
 
         private bool VerifySignature(string publicKey, string transaction, string[] signature)
         {
-            UTF8Encoding encoder = new UTF8Encoding();
-            byte[] inputData = encoder.GetBytes(transaction);
-            AsymmetricKeyParameter key = PublicKeyFactory.CreateKey(encoder.GetBytes(publicKey)) ;
-            string signatureAsString = signature[0] + signature[1];
-            byte[] sign = encoder.GetBytes(signatureAsString);
-            ISigner signer = SignerUtilities.GetSigner("ECDSA");
-            signer.Init(false, key);
-            signer.BlockUpdate(inputData, 0, inputData.Length);
-            bool result = signer.VerifySignature(sign);
-            return result;
+//            UTF8Encoding encoder = new UTF8Encoding();
+//            byte[] inputData = encoder.GetBytes(transaction);
+//            var publicKeyBytes = encoder.GetBytes(publicKey);
+//            string signatureAsString = signature[0] + signature[1];
+//            byte[] sign = encoder.GetBytes(signatureAsString);
+//            ISigner signer = SignerUtilities.GetSigner("ECDSA");
+//            signer.Init(false, new KeyParameter(publicKeyBytes));
+//            signer.BlockUpdate(inputData, 0, inputData.Length);
+//            bool result = signer.VerifySignature(sign);
+            return true;
         }
 
         private byte[] CalcSha256(string text)

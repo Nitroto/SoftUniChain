@@ -100,8 +100,8 @@ export class WalletComponent implements OnInit {
     const transactionSignature = privateKey.sign(transactionPayloadHash);
     const senderSignature = [transactionSignature.r.toString(16), transactionSignature.s.toString(16)];
     const data = transactionPayLoad;
+    data['transactionHash'] = transactionPayloadHash;
     data['senderSignature'] = senderSignature;
-    console.log(data);
     this.sendTransaction(data, form);
   }
 
@@ -115,7 +115,7 @@ export class WalletComponent implements OnInit {
         form.controls['value'].reset();
         form.controls['value'].clearValidators();
         transaction$.subscribe(transaction => {
-          this._toastyService.success('Transaction was successfully add to blockchain.', 'Success');
+          this._toastyService.success('Transaction was successfully added to blockchain.', 'Success');
         }, err => {
           this._toastyService.error('Transaction was unsuccessful.', 'Major Error');
         });

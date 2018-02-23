@@ -9,15 +9,14 @@ import { MatButtonModule, MatCheckboxModule, MatDialogModule,
   MatExpansionModule, MatFormFieldModule, MatGridListModule,
   MatIconModule, MatSelectModule } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ToastyModule } from 'ng2-toasty';
 import { NgxQRCodeModule} from '@techiediaries/ngx-qrcode';
+import { ToastrModule } from 'ngx-toastr';
 
 import { AppComponent } from './components/app/app.component';
 import { TransactionContentDialog, WalletComponent } from './components/wallet/wallet.component';
 import { HomeComponent } from './components/home/home.component';
 import { NavigationComponent } from './components/navigation/navigation.component';
 import { WalletService } from './services/wallet.service';
-
 
 @NgModule({
   declarations: [
@@ -44,7 +43,12 @@ import { WalletService } from './services/wallet.service';
     MatCheckboxModule,
     MatFormFieldModule,
     NgbModule.forRoot(),
-    ToastyModule.forRoot(),
+    ToastrModule.forRoot({
+      timeOut: 5000,
+      positionClass: 'toast-top-right',
+      preventDuplicates: true,
+      closeButton: true
+    }),
     RouterModule.forRoot([
       { path: '', redirectTo: '/home' , pathMatch: 'full' },
       { path: 'home', component: HomeComponent },

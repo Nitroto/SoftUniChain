@@ -1,12 +1,13 @@
-import { Component, DoCheck, Inject, OnInit} from '@angular/core';
+import { Component, Inject, OnInit} from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material';
 import { WalletService } from '../../services/wallet.service';
 import { FormControl, NgForm } from '@angular/forms';
+import { Observable } from 'rxjs/Observable';
+import { ToastrService } from 'ngx-toastr';
 
 import * as elliptic from 'elliptic';
 import * as hashes from 'jshashes';
 import * as utf8 from 'utf8';
-import { Observable } from 'rxjs/Observable';
 
 
 @Component({
@@ -14,7 +15,7 @@ import { Observable } from 'rxjs/Observable';
   templateUrl: './wallet.component.html',
   styleUrls: ['./wallet.component.css']
 })
-export class WalletComponent implements OnInit, DoCheck {
+export class WalletComponent implements OnInit {
 
   customSelection = new FormControl(false);
   privateKeyPattern = '^[A-Za-z0-9]{64}$';
@@ -38,7 +39,7 @@ export class WalletComponent implements OnInit, DoCheck {
   transactions$: any;
   user$: any;
 
-  constructor(public dialog: MatDialog, private _walletServices: WalletService) {
+  constructor(public dialog: MatDialog, private _walletServices: WalletService, private _toastyService: ToastrService) {
   }
 
   ngOnInit(): void {
@@ -57,10 +58,6 @@ export class WalletComponent implements OnInit, DoCheck {
     }
   }
 
-  ngDoCheck(): void {
-  }
-
-
   getNodeInfo(): void {
     const address = this.node + '/api/info';
     this.info$ = this._walletServices.getData(address);
@@ -71,6 +68,7 @@ export class WalletComponent implements OnInit, DoCheck {
     const keyPair = ec.genKeyPair();
     this.saveKey(keyPair);
     this.user$ = this.loadUserDataFromChain();
+    this._toastyService.success('Wallet was generated successfully.', 'New wallet');
   }
 
   loadWallet(): void {
@@ -79,6 +77,7 @@ export class WalletComponent implements OnInit, DoCheck {
     const keyPair = ec.keyFromPrivate(userPrivateKey);
     this.saveKey(keyPair);
     this.user$ = this.loadUserDataFromChain();
+    this._toastyService.success('Wallet was loaded successfully.', 'Wallet recovered');
   }
 
   loadUserDataFromChain(): Observable<any> {
@@ -96,21 +95,30 @@ export class WalletComponent implements OnInit, DoCheck {
       'dateCreated': new Date().toISOString()
     };
     const transactionPayLoadAsString = JSON.stringify(transactionPayLoad).toString();
-    const transactionPayloadHash = new hashes.SHA256().hex_hmac(utf8.encode(transactionPayLoadAsString));
+    const transactionPayloadHash = new hashes.SHA256().hex(utf8.encode(transactionPayLoadAsString));
     const privateKey = new elliptic.ec('secp256k1').keyFromPrivate(this.wallet.privateKey);
     const transactionSignature = privateKey.sign(transactionPayloadHash);
     const senderSignature = [transactionSignature.r.toString(16), transactionSignature.s.toString(16)];
     const data = transactionPayLoad;
     data['senderSignature'] = senderSignature;
+    this.sendTransaction(data, form);
+  }
+
+  private sendTransaction(data, form: NgForm): void {
     this.openSigningDialog(data).subscribe(result => {
       if (result) {
         const address = this.node + '/api/transactions';
-        data['transactionHash'] = new hashes.SHA256().hex_hmac(utf8.encode(JSON.stringify(data).toString()));
-        this.transactions$ = this._walletServices.sendSigntTransaction(address, data);
+        let transaction$ = this._walletServices.sendSigntTransaction(address, data);
         form.controls['recipient'].reset();
         form.controls['recipient'].clearValidators();
         form.controls['value'].reset();
         form.controls['value'].clearValidators();
+
+        transaction$.subscribe(transaction => {
+          this._toastyService.success('Transaction was successfully add to blockchain.', 'Success');
+        }, err => {
+          this._toastyService.error('Transaction was unsuccessful.', 'Major Error');
+        });
       }
     });
   }

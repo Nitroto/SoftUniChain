@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using Newtonsoft.Json;
@@ -28,38 +29,43 @@ namespace Node.Services
         {
             var transactionData = new
             {
-                from = transaction.From,
-                to = transaction.To,
+                from = transaction.From.AddressId,
+                to = transaction.To.AddressId,
                 senderPublicKey = transaction.SenderPublicKey,
                 value = transaction.Value,
                 fee = transaction.Fee,
                 dateCreated = transaction.DateCreated
             };
 
-            string transactionPayLoadAsString = JsonConvert.SerializeObject(transactionData);
-            string transactionHash = CalcSha256(transactionPayLoadAsString);
+            string transactionPayLoadAsString = JsonConvert.SerializeObject(transactionData).Replace(" ", "");
+            string transactionHash = BytesToHex(CalcSha256(transactionPayLoadAsString));
 
+            Console.WriteLine(transactionPayLoadAsString);
             Console.WriteLine(transactionHash);
-//            if (transactionHash != transaction.TransactionHash)
-//            {
-//                return false;
-//            }
-            // get transactionData
-            // hash transactionData
+            if (transactionHash != transaction.TransactionHash)
+            {
+                return false;
+            }
+
             // validate signature???
 
             return true;
         }
 
-        private string CalcSha256(string text)
+        private byte[] CalcSha256(string text)
         {
-            using (var sha256 = SHA256.Create() )
-            {
-                byte[] bytes = Encoding.UTF8.GetBytes(text);
-                var hashBytes = sha256.ComputeHash(bytes);
-                var hash = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
-                return hash;
-            }
+            byte[] bytes = Encoding.UTF8.GetBytes(text);
+            Sha256Digest digest = new Sha256Digest();
+            digest.BlockUpdate(bytes, 0, bytes.Length);
+            byte[] result = new byte[digest.GetDigestSize()];
+            digest.DoFinal(result, 0);
+
+            return result;
+        }
+
+        private string BytesToHex(byte[] bytes)
+        {
+            return string.Concat(bytes.Select(b => b.ToString("x2")));
         }
     }
 }

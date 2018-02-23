@@ -147,19 +147,19 @@ namespace Node.Services
 
         private void UpdateCollections(Block block)
         {
-            foreach (Transaction t in block.Transactions)
-            {
-                t.From.Amount -= t.Value;
-                t.To.Amount += t.Value;
-
-                t.MinedInBlockIndex = block.Index;
-
-                // TODO: What exactly Paid means
-                t.TransferSuccessfull = true;
-
-                this._confirmedTransactionsByHash.TryAdd(t.TransactionHash, t);
-                this._pendingTransactionsByHash.TryRemove(t.TransactionHash, out var Ignore);
-            }
+//            foreach (Transaction t in block.Transactions)
+//            {
+//                t.From.Amount -= t.Value;
+//                t.To.Amount += t.Value;
+//
+//                t.MinedInBlockIndex = block.Index;
+//
+//                // TODO: What exactly Paid means
+//                t.TransferSuccessfull = true;
+//
+//                this._confirmedTransactionsByHash.TryAdd(t.TransactionHash, t);
+//                this._pendingTransactionsByHash.TryRemove(t.TransactionHash, out var Ignore);
+//            }
         }
 
         private bool IsBlockValid(Block block)

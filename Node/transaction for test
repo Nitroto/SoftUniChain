@@ -1,0 +1,9 @@
+{
+	from: "c6a70a0d7f571e70dab05fce44b01c698eef96ff",
+	to: "c119abbd1c06c92087b870b3be833cd3987b2a09", 
+	senderPublicKey: "ecfb8af5d33fa1f72f6fede69e533cd1709736a8c4a75429fa0ee01ec425d9430",
+	value: 1000000,
+	fee: 20,
+	dateCreated: "2018-02-23T14:35:18.713Z", 
+	senderSignature: [ "a42ace2e3c6a90f5c7c07dbbaefff0f0257d9322ba3b725f7713b3e07f7b1310", "cbbc64e0a2fcedd7f5e82c524643f7823c23bcb738fc638ad1a96bbbd3d62442" ] 
+}	

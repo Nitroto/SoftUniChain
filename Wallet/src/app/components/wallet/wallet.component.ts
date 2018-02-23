@@ -101,6 +101,7 @@ export class WalletComponent implements OnInit {
     const senderSignature = [transactionSignature.r.toString(16), transactionSignature.s.toString(16)];
     const data = transactionPayLoad;
     data['senderSignature'] = senderSignature;
+    console.log(data);
     this.sendTransaction(data, form);
   }
 
@@ -113,7 +114,6 @@ export class WalletComponent implements OnInit {
         form.controls['recipient'].clearValidators();
         form.controls['value'].reset();
         form.controls['value'].clearValidators();
-
         transaction$.subscribe(transaction => {
           this._toastyService.success('Transaction was successfully add to blockchain.', 'Success');
         }, err => {

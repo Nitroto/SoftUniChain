@@ -11,7 +11,7 @@ namespace Node.Resources
         public int Fee { get; set; }
         public DateTime DateCreated { get; set; }
         public string SenderPublicKey { get; set; }
-        public IEnumerable<string> SenderSignature { get; set; }
+        public string[] SenderSignature { get; set; }
         public string TransactionHash { get; set; }
         public int? MinedInBlockIndex { get; set; }
         public bool TransferSuccessfull { get; set; }

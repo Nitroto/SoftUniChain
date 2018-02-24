@@ -240,3 +240,5 @@ _Pvt_Extensions
 .vscode/
 Wallet/.idea/
 Wallet/node_modules/
+Faucet/.idea/
+Faucet/node_modules/

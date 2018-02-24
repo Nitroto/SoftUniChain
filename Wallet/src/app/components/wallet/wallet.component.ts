@@ -100,7 +100,6 @@ export class WalletComponent implements OnInit {
     const transactionSignature = privateKey.sign(transactionPayloadHash);
     const senderSignature = [transactionSignature.r.toString(16), transactionSignature.s.toString(16)];
     const data = transactionPayLoad;
-    data['transactionHash'] = transactionPayloadHash;
     data['senderSignature'] = senderSignature;
     this.sendTransaction(data, form);
   }

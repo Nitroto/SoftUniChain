@@ -82,38 +82,33 @@ namespace Node.Services
             return this._confirmedTransactionsByHash.ContainsKey(hash) ? this._confirmedTransactionsByHash[hash] : null;
         }
 
+        public bool CheckForCollison(string transactionHash)
+        {
+            return (this._pendingTransactionsByHash.ContainsKey(transactionHash) ||
+                    this._confirmedTransactionsByHash.ContainsKey(transactionHash));
+        }
+
+        public bool CheckSenderBalance(string senderId, ulong amount)
+        {
+            if (!this._addresses.ContainsKey(senderId))
+            {
+                return false;
+            }
+
+            return (ulong)(this._addresses[senderId].Amount * 1000000) >= amount;
+        }
+
         public void AddTransaction(Transaction transaction)
         {
-            string transactionHash = transaction.TransactionHash;
-            
-            if (!this._pendingTransactionsByHash.ContainsKey(transactionHash) &&
-                !this._confirmedTransactionsByHash.ContainsKey(transactionHash))
-            {
-                this._pendingTransactionsByHash.TryAdd(transactionHash, transaction);
-                if (!this._transactionHashByAddressId.ContainsKey(transaction.From.AddressId))
-                {
-                    this._transactionHashByAddressId.TryAdd(transaction.From.AddressId, new List<string>());
-                }
-                
-                this._transactionHashByAddressId[transaction.From.AddressId].Add(transaction.TransactionHash);
-                
-                if (!this._transactionHashByAddressId.ContainsKey(transaction.To.AddressId))
-                {
-                    this._transactionHashByAddressId.TryAdd(transaction.To.AddressId, new List<string>());
-                }
-                
-                this._transactionHashByAddressId[transaction.To.AddressId].Add(transaction.TransactionHash);
+            string hash = transaction.TransactionHash;
 
-                if (!this._addresses.ContainsKey(transaction.From.AddressId))
-                {
-                    this._addresses.TryAdd(transaction.From.AddressId, transaction.From);
-                }
-                
-                if (!this._addresses.ContainsKey(transaction.To.AddressId))
-                {
-                    this._addresses.TryAdd(transaction.To.AddressId, transaction.To);
-                }
-            }
+            this._pendingTransactionsByHash.TryAdd(hash, transaction);
+
+            this.AddTransactionToAddress(transaction.From, hash);
+            this.AddTransactionToAddress(transaction.To, hash);
+
+            this.AddAddress(transaction.From);
+            this.AddAddress(transaction.To);
         }
 
         public Address GetAddress(string id)
@@ -135,7 +130,27 @@ namespace Node.Services
 
         public IEnumerable<string> GetTransactionsByAddressId(string addressId)
         {
-            return this._transactionHashByAddressId.ContainsKey(addressId) ? this._transactionHashByAddressId[addressId].ToArray() : null;
+            return this._transactionHashByAddressId.ContainsKey(addressId)
+                ? this._transactionHashByAddressId[addressId].ToArray()
+                : null;
+        }
+
+        private void AddTransactionToAddress(Address address, string transactionHash)
+        {
+            if (!this._transactionHashByAddressId.ContainsKey(address.AddressId))
+            {
+                this._transactionHashByAddressId.TryAdd(address.AddressId, new List<string>());
+            }
+
+            this._transactionHashByAddressId[address.AddressId].Add(transactionHash);
+        }
+
+        private void AddAddress(Address address)
+        {
+            if (!this._addresses.ContainsKey(address.AddressId))
+            {
+                this._addresses.TryAdd(address.AddressId, address);
+            }
         }
 
         private void ProcessNewBlock(Block block)

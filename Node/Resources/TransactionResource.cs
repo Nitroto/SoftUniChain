@@ -7,8 +7,8 @@ namespace Node.Resources
     {
         public string From { get; set; }
         public string To { get; set; }
-        public long Value { get; set; }
-        public int Fee { get; set; }
+        public ulong Value { get; set; }
+        public uint Fee { get; set; }
         public DateTime DateCreated { get; set; }
         public string SenderPublicKey { get; set; }
         public string[] SenderSignature { get; set; }

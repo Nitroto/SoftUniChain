@@ -52,7 +52,7 @@
 
     <div *ngIf="customSelection.value">
       <mat-form-field class="full-width" >
-        <input matInput placeholder="Custom node:" type="text" name="customNode" id="customNode" [(ngModel)]="node">
+        <input matInput placeholder="Custom node" type="text" name="customNode" id="customNode" [(ngModel)]="node">
       </mat-form-field>
 
       <button mat-raised-button color="primary" (click)="getNodeInfo()">Get Info</button>

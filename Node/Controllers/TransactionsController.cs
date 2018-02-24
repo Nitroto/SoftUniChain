@@ -44,35 +44,45 @@ namespace Node.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddTransaction([FromBody]TransactionResource transactionResource)
+        public IActionResult AddTransaction([FromBody]TransactionResource receivedTransaction)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
+            if (!this._nodeService.CheckSenderBalance(receivedTransaction.From, receivedTransaction.Value))
+            {
+                return BadRequest("Insufficient funds.");
+            }
+
             Transaction transaction = new Transaction
             {
-                From = new Address(transactionResource.From),
-                To = new Address(transactionResource.To),
-                Value = transactionResource.Value,
-                Fee = transactionResource.Fee,
-                SenderPublicKey = transactionResource.SenderPublicKey,
-                DateCreated = transactionResource.DateCreated,
-                TransactionHash = transactionResource.TransactionHash
+                From = new Address(receivedTransaction.From),
+                To = new Address(receivedTransaction.To),
+                Value = receivedTransaction.Value,
+                Fee = receivedTransaction.Fee,
+                SenderPublicKey = receivedTransaction.SenderPublicKey,
+                DateCreated = receivedTransaction.DateCreated,
             };
-//            Transaction transaction = this._mapper.Map<TransactionResource, Transaction>(transactionResource);
 
-            bool validTransaction = this._transactionService.Validate(transaction);
+            transaction.TransactionHash = this._transactionService.CalculateTransactionHash(transaction);
 
-            if (!validTransaction)
+            if (!this._transactionService.Validate(transaction))
             {
-                return BadRequest("Invalid transaction.");
+                return BadRequest("Invalid transaction signature.");
+            }
+
+            if (this._nodeService.CheckForCollison(transaction.TransactionHash))
+            {
+                return BadRequest("Transaction already exists.");
             }
 
             this._nodeService.AddTransaction(transaction);
 
-            return Ok(transactionResource);
+            TransactionResource response = this._mapper.Map<Transaction, TransactionResource>(transaction);
+
+            return Ok(response);
         }
     }
 }

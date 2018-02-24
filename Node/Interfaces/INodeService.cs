@@ -17,5 +17,7 @@ namespace Node.Interfaces
         
         Address GetAddress(string id);
         IEnumerable<Address> GetAllAddresses();
+        bool CheckForCollison(string transactionHash);
+        bool CheckSenderBalance(string senderId, ulong amount);
     }
 }

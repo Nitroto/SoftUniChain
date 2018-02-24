@@ -4,8 +4,10 @@
     <div class="text-center">
       <p><b>From:</b> {{data.from | slice:0:5}}...{{data.from | slice:-5}} <b>To:</b> {{data.to | slice:0:5}}...{{data.to | slice:-5}}</p>
       <p><mat-icon>person</mat-icon>     <mat-icon>arrow_forward</mat-icon>     <mat-icon>person</mat-icon></p>
-      <p><b>Amount:</b>   {{ data.value }}&mu;</p>
-      <p><b>Fee:</b>   {{ data.fee }}&mu;</p>
+      <p><b>Amount:</b>   {{ data.value }} &mu;</p>
+      <p><b>Fee:</b>   {{ data.fee }} &mu;</p>
+      <hr width="75%" size="2">
+      <p><b>Total:</b> {{ data.fee + data.value }} &mu;</p>
     </div>
   </mat-dialog-content>
   <mat-dialog-actions>

@@ -2,8 +2,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlockExplorer", "BlockExplorer\BlockExplorer.csproj", "{A767B162-92D2-4CB1-AEAD-4337C4882CE1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Faucet", "Faucet\Faucet.csproj", "{4D2C5479-1977-4A5D-B464-C4387B19E87A}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Miner", "Miner\Miner.csproj", "{6CF5E862-FB39-44E8-9377-2E898F132329}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Node", "Node\Node.csproj", "{093E9A79-83F2-428C-AFFD-4FD286827EF2}"
@@ -18,10 +16,6 @@ Global
 		{A767B162-92D2-4CB1-AEAD-4337C4882CE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A767B162-92D2-4CB1-AEAD-4337C4882CE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A767B162-92D2-4CB1-AEAD-4337C4882CE1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4D2C5479-1977-4A5D-B464-C4387B19E87A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4D2C5479-1977-4A5D-B464-C4387B19E87A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4D2C5479-1977-4A5D-B464-C4387B19E87A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4D2C5479-1977-4A5D-B464-C4387B19E87A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6CF5E862-FB39-44E8-9377-2E898F132329}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6CF5E862-FB39-44E8-9377-2E898F132329}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6CF5E862-FB39-44E8-9377-2E898F132329}.Release|Any CPU.ActiveCfg = Release|Any CPU

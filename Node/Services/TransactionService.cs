@@ -32,8 +32,8 @@ namespace Node.Services
             // populate signature in the transaction
             throw new System.NotImplementedException();
         }
-
-        public bool Validate(Transaction transaction)
+        
+        public string CalculateTransactionHash(Transaction transaction)
         {
             var transactionData = new
             {
@@ -42,23 +42,17 @@ namespace Node.Services
                 senderPublicKey = transaction.SenderPublicKey,
                 value = transaction.Value,
                 fee = transaction.Fee,
-                dateCreated = transaction.DateCreated
+                dateCreated = transaction.DateCreated,
+                senderSignature = transaction.SenderSignature
             };
 
             string transactionPayLoadAsString = JsonConvert.SerializeObject(transactionData).Replace(" ", "");
             string transactionHash = BytesToHex(CalcSha256(transactionPayLoadAsString));
 
-            if (transactionHash != transaction.TransactionHash)
-            {
-                return false;
-            }
-
-            // validate signature???
-            bool result = VerifySignature(transaction.SenderPublicKey, transactionPayLoadAsString, transaction.SenderSignature);
-            return result;
+            return transactionHash;
         }
 
-        private bool VerifySignature(string publicKey, string transaction, string[] signature)
+        public bool Validate(Transaction transaction)
         {
 //            UTF8Encoding encoder = new UTF8Encoding();
 //            byte[] inputData = encoder.GetBytes(transaction);

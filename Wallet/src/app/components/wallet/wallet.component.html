@@ -1,5 +1,5 @@
 <mat-accordion class="full-width">
-  <mat-expansion-panel [expanded]="!wallet.privateKey">
+  <mat-expansion-panel [expanded]="(!wallet.privateKey || !wallet.publicKey || !wallet.address)">
     <mat-expansion-panel-header>
       <mat-panel-title>
         <b>Create or load wallet</b>
@@ -68,7 +68,7 @@
       <ngx-qrcode
         qrc-element-type="url"
         [qrc-value]="wallet.address"
-        qrc-version="5">
+        qrc-version="6">
       </ngx-qrcode>
       <div class="card-block">
         <h3 class="card-title">Your balance: <b>{{0| currency:'SUC':'.2-5'}}</b></h3>

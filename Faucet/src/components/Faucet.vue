@@ -102,7 +102,6 @@
                 this.$validator.validateAll().then((result) => {
                     if (result) {
                         this.signTransaction();
-                        return;
                     }
                 });
             },
@@ -119,7 +118,7 @@
 
                 let transactionPayLoadAsString = JSON.stringify(transactionPayLoad).toString();
                 let transactionPayloadHash = new hashes.SHA256().hex(utf8.encode(transactionPayLoadAsString));
-                let privateKey = new elliptic.ec('secp256k1').keyFromPrivate(this.wallet.privateKey);
+                let privateKey = new elliptic.ec('secp256k1').keyFromPrivate(this.privateKey);
                 let transactionSignature = privateKey.sign(transactionPayloadHash);
                 let senderSignature = [transactionSignature.r.toString(16), transactionSignature.s.toString(16)];
                 let data = transactionPayLoad;
@@ -128,15 +127,17 @@
             },
 
             sendTransaction(data) {
-                let address = this.nodeUrl + '/api/transactions';
-                this.$http.post(address, data, {
+                let url = this.nodeUrl + '/api/transactions';
+                this.$http.post(url, data, {
                     headers: {
                         'Content-Type': 'application/json',
                         'Access-Control-Allow-Origin': '*'
                     }
-                }).then(response => {
-
-                }, response => {
+                }).then(() => {
+                    this.$toastr('success', 'Success msg', 'Success');
+                    location.reload();
+                }, () => {
+                    this.$toastr('error', 'Error msg', 'Error');
 
                 });
             }
@@ -146,6 +147,5 @@
 
 <style lang="sass">
     @import "../mq"
-    /*@import "../node-modules/vue-toastr/src/vue-toastr"*/
 
 </style>

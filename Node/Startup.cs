@@ -44,7 +44,7 @@ namespace Node
                 {
                     Title = "SoftUni Blockchain Node",
                     Version = "v1",
-                    Description = "SoftUni Blockchain Node ASP.NET Core Web API",
+                    Description = "SoftUni Blockchain Node ASP.NET Core REST API",
                     TermsOfService = "None",
                     Contact = new Contact { Name = "Asen Todorov", Email = "", Url = "" },
                     License = new License { Name = "", Url = "" }

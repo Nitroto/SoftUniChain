@@ -4,6 +4,7 @@ import VueResource from 'vue-resource'
 import VeeValidate from 'vee-validate';
 import VueQrcode from '@xkeshi/vue-qrcode';
 import VueToastr from '@deveodk/vue-toastr'
+import Vue2Filters from 'vue2-filters'
 
 
 Vue.config.productionTip = false;
@@ -15,6 +16,7 @@ Vue.use(VueToastr,{
     clickClose: true
 });
 Vue.component('qrcode', VueQrcode);
+Vue.use(Vue2Filters);
 
 new Vue({
   render: h => h(App)

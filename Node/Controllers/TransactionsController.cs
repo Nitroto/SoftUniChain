@@ -80,9 +80,7 @@ namespace Node.Controllers
 
             this._nodeService.AddTransaction(transaction);
 
-            TransactionResource response = this._mapper.Map<Transaction, TransactionResource>(transaction);
-
-            return Ok(response);
+            return Ok(transaction.TransactionHash);
         }
     }
 }

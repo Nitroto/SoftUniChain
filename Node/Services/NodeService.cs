@@ -192,7 +192,7 @@ namespace Node.Services
             if (_genesisBlock != null) return;
             Transaction t = new Transaction()
             {
-                From = new Address("00"),
+                From = new Address("0000000000000000000000000000000000000000"),
                 To = new Address("bee3f694bf0fbf9556273e85d43f2e521d24835e"),
                 DateCreated = DateTime.Now,
                 Value = 1000000000,
@@ -201,14 +201,11 @@ namespace Node.Services
                 TransferSuccessfull = true
             };
             
-            this.AddTransaction(t);
+            this.AddAddress(t.To);
+            this._addresses[t.To.AddressId].Amount += (long)t.Value;
             
-            IList<Transaction> transactions = new List<Transaction> {t};
-            
-            this._confirmedTransactionsByHash.TryAdd(t.TransactionHash, t);
-            this._pendingTransactionsByHash.TryRemove(t.TransactionHash, out var Ignore);
-
-            _genesisBlock = new Block(0, 1, new Address("00"), string.Empty, transactions);
+            List<Transaction> transactions = new List<Transaction>(){t};
+            _genesisBlock = new Block(0, 5, new Address("0000000000000000000000000000000000000000"), string.Empty, transactions);
 
             this.ProcessNewBlock(_genesisBlock);
         }

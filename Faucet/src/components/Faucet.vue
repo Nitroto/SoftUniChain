@@ -5,7 +5,7 @@
             <div class="faucet">
                 <section class="section">
                     <div class="has-text-centered">
-                        <h1><strong>Balance: {{ balance }} SUC</strong></h1>
+                        <h1><strong>Balance: {{ balance | currency('', 0) }} SUC</strong></h1>
                     </div>
 
                     <div class="container">
@@ -59,7 +59,7 @@
                             <div class="field is-grouped">
                                 <div class="control">
                                     <p>
-                                        <input class="button is-info"
+                                        <input class="button is-info is-fullwidth"
                                                type="submit"
                                                value="Get coins!"
                                                :disabled="(!(isVerify && !errors.has('nodeUrl') && !errors.has('recipient')))">
@@ -69,7 +69,25 @@
                         </form>
                     </div>
                 </section>
+
+                <table class="table is-striped is-fullwidth" v-if="transactions.length > 0">
+                    <thead>
+                        <tr>
+                            <th>Transaction</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr v-for="transaction of transactions" :key="transaction.hash">
+                            <td>
+                                <a href="transaction.url">{{ transaction.hash }}</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
+
+
         </div>
         <div class="column"></div>
     </div>
@@ -88,13 +106,28 @@
         components: {
             VueRecaptcha
         },
+        created: function () {
+            let url = this.nodeUrl + '/api/addresses/' + this.address;
+            this.$http.get(url, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                }
+            }).then(result => {
+                this.balance = result.body.amount / 1000000;
+            }, () => {
+                this.$toastr('error', 'There is some connection problem.', 'Error');
+            });
+
+        },
         data: function () {
             return {
                 balance: 0,
                 siteKey: '6LezVkgUAAAAAEDM9ZQyuYB_gAepXJoX0Jg-UpFx',
                 recipient: '',
-                nodeUrl: 'http://loclhost:5000',
+                nodeUrl: 'http://localhost:5000',
                 isVerify: false,
+                transactions: []
             };
         },
         methods: {
@@ -133,8 +166,9 @@
                         'Content-Type': 'application/json',
                         'Access-Control-Allow-Origin': '*'
                     }
-                }).then(() => {
-                    this.$toastr('success', 'Success msg', 'Success');
+                }).then(result => {
+                    this.$toastr('success', 'You received 1 SUC.', 'Success');
+                    this.transactions.push({hash: result.body, url: this.nodeUrl + '/api/transactions/' + result.body});
                     this.recipient = '';
                     this.resetForm();
                 }, () => {

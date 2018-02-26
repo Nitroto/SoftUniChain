@@ -95,7 +95,7 @@ namespace Node.Services
                 return false;
             }
 
-            return (ulong)(this._addresses[senderId].Amount * 1000000) >= amount;
+            return (ulong) (this._addresses[senderId].Amount * 1000000) >= amount;
         }
 
         public void AddTransaction(Transaction transaction)
@@ -190,9 +190,23 @@ namespace Node.Services
         private void ProcessGenesisBlock()
         {
             if (_genesisBlock != null) return;
-            Transaction t = new Transaction();
-
+            Transaction t = new Transaction()
+            {
+                From = new Address("00"),
+                To = new Address("bee3f694bf0fbf9556273e85d43f2e521d24835e"),
+                DateCreated = DateTime.Now,
+                Value = 1000000000,
+                Fee = 0,
+                MinedInBlockIndex = 0,
+                TransferSuccessfull = true
+            };
+            
+            this.AddTransaction(t);
+            
             IList<Transaction> transactions = new List<Transaction> {t};
+            
+            this._confirmedTransactionsByHash.TryAdd(t.TransactionHash, t);
+            this._pendingTransactionsByHash.TryRemove(t.TransactionHash, out var Ignore);
 
             _genesisBlock = new Block(0, 1, new Address("00"), string.Empty, transactions);
 

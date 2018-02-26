@@ -17,7 +17,7 @@
                                 <p class="control has-icon has-icons-left">
                                     <input name="recipient"
                                            v-model="recipient"
-                                           v-validate="'required'"
+                                           v-validate="'required|regex:^[A-Za-z0-9]{40}$'"
                                            :class="{'input': true, 'is-danger': errors.has('recipient') }"
                                            type="text"
                                            placeholder="Your blockchain address">
@@ -135,11 +135,18 @@
                     }
                 }).then(() => {
                     this.$toastr('success', 'Success msg', 'Success');
-                    location.reload();
+                    this.recipient = '';
+                    this.resetForm();
                 }, () => {
                     this.$toastr('error', 'Error msg', 'Error');
-
+                    this.resetForm();
                 });
+            },
+
+            resetForm() {
+                this.isVerify = false;
+                this.$refs.recaptcha.reset();
+                this.$validator.reset()
             }
         }
     }

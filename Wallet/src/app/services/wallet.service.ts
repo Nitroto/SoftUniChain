@@ -14,6 +14,12 @@ export class WalletService {
     return this._http.get(address, options);
   }
 
+  getBalance(address): Observable<any> {
+
+    const options = {headers: this._headers};
+    return this._http.get(address, options);
+  }
+
   sendSignedTransaction(address, transaction): Observable<any> {
     console.log(transaction);
     const data = JSON.stringify(transaction);

@@ -9,7 +9,8 @@
     </mat-expansion-panel-header>
     <p>To generate a new wallet just press <b>Generate New</b> button and you will receive random private key,
       public key and address.</p>
-    <p>To load your wallet enter your wallet private key (compressed ECDSA key, 65 hex digits) and press <b>Load Wallet</b>
+    <p>To load your wallet enter your wallet private key (compressed ECDSA key, 65 hex digits) and press <b>Load
+      Wallet</b>
       button.</p>
 
     <form class="wallet-form full-width">
@@ -51,7 +52,7 @@
     </p>
 
     <div *ngIf="customSelection.value">
-      <mat-form-field class="full-width" >
+      <mat-form-field class="full-width">
         <input matInput placeholder="Custom node" type="text" name="customNode" id="customNode" [(ngModel)]="node">
       </mat-form-field>
 
@@ -71,13 +72,16 @@
         qrc-version="6">
       </ngx-qrcode>
       <div class="card-block">
-        <h3 class="card-title">Your balance: <b>{{0| currency:'SUC':'.2-5'}}</b></h3>
+        <div *ngIf="user$ | async as user; else noUser">
+          <p>{{ user | json }}</p>
+          <h3 class="card-title">Your balance: <b>{{user.amount | currency:'SUC':'.2-5'}}</b></h3>
+        </div>
         <p class="card-text">{{ wallet.address }}</p>
       </div>
+      <ng-template #noUser>
+        <h3 class="card-title">Your balance: <b>{{0 | currency:'SUC':'.2-5'}}</b></h3>
+      </ng-template>
 
-      <div *ngIf="user$ | async as user">
-        <p>{{ user | json }}</p>
-      </div>
     </div>
   </div>
 
@@ -89,12 +93,13 @@
 
     <form #f="ngForm" (ngSubmit)="signTransaction(f)" class="send-form">
       <mat-form-field class="full-width">
-          <input matInput type="text" placeholder="Recipient" name="recipient" id="recipient" #recipient="ngModel"
-                    [(ngModel)]="transaction.to" [pattern]="addressPattern" required>
+        <input matInput type="text" placeholder="Recipient" name="recipient" id="recipient" #recipient="ngModel"
+               [(ngModel)]="transaction.to" [pattern]="addressPattern" required>
       </mat-form-field>
 
       <mat-form-field class="full-width">
-        <input matInput placeholder="Amount" type="number" name="value" id="value" [(ngModel)]="transaction.value" required>
+        <input matInput placeholder="Amount" type="number" name="value" id="value" [(ngModel)]="transaction.value"
+               required>
         <span matPrefix><mat-icon>monetization_on</mat-icon></span>
       </mat-form-field>
 
@@ -113,7 +118,7 @@
 </div>
 
 <!--<div *ngIf="transactions$ | async as transactions">-->
-  <!--{{transactions | json}}-->
+<!--{{transactions | json}}-->
 <!--</div>-->
 
 

@@ -190,22 +190,23 @@ namespace Node.Services
         private void ProcessGenesisBlock()
         {
             if (_genesisBlock != null) return;
-            Transaction t = new Transaction()
+            Transaction faucet = new Transaction()
             {
                 From = new Address("0000000000000000000000000000000000000000"),
                 To = new Address("bee3f694bf0fbf9556273e85d43f2e521d24835e"),
                 DateCreated = DateTime.Now,
-                Value = 1000000000,
+                Value = 2000000000,
                 Fee = 0,
                 MinedInBlockIndex = 0,
                 TransferSuccessfull = true
             };
-            
-            this.AddAddress(t.To);
-            this._addresses[t.To.AddressId].Amount += (long)t.Value;
-            
-            List<Transaction> transactions = new List<Transaction>(){t};
-            _genesisBlock = new Block(0, 5, new Address("0000000000000000000000000000000000000000"), string.Empty, transactions);
+
+            this.AddAddress(faucet.To);
+            this._addresses[faucet.To.AddressId].Amount += (long) faucet.Value;
+
+            List<Transaction> transactions = new List<Transaction>() {faucet};
+            _genesisBlock = new Block(0, 5, null, new Address("0000000000000000000000000000000000000000"), string.Empty,
+                transactions);
 
             this.ProcessNewBlock(_genesisBlock);
         }

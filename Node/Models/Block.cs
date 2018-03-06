@@ -1,36 +1,69 @@
 ﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
+using Node.Utilities;
 
 namespace Node.Models
 {
     public class Block
     {
-        public Block(int index, long difficulty, Address mineBy, string previousBlockHash,
-            IList<Transaction> transactions)
+        public Block(int index, long difficulty, long? nonce, Address mineBy, string previousBlockHash,
+            IEnumerable<Transaction> transactions)
         {
             this.Index = index;
             this.CreatedOn = DateTime.Now;
             this.Difficulty = difficulty;
+            this.Nonce = nonce;
             this.MineBy = mineBy;
             this.PreviousBlockHash = previousBlockHash;
             this.Transactions = transactions;
+            this.BlockDataHash = CalculateBlockDataHash();
+            this.BlockHash = this.GenerateHash();
         }
 
-        public int Index { get; set; }
-        public DateTime CreatedOn { get; set; }
-        public long Difficulty { get; set; }
-        public Address MineBy { get; set; }
-        public string PreviousBlockHash { get; set; }
-        public string BlockHash { get; set; }
-        public string BlockDataHash { get; set; }
-        public long Nonce { get; set; }
-        public IList<Transaction> Transactions { get; set; }
+        public int Index { get; private set; }
+        public DateTime CreatedOn { get; private set; }
+        public long Difficulty { get; private set; }
+        public Address MineBy { get; private set; }
+        public string PreviousBlockHash { get; private set; }
+        public string BlockHash { get; private set; }
+        public string BlockDataHash { get; private set; }
+        public long? Nonce { get; private set; }
+        public IEnumerable<Transaction> Transactions { get; private set; }
 
-        public void GenerateHash()
+        public string GenerateHash()
         {
-            this.BlockDataHash = "hardcoded data hash, TODO merkel tree and hashing";
-            this.Nonce = 1234567890;
-            this.BlockHash = "hardcoded block hash - TODO use mining process";
+            var block = new
+            {
+                blockDataHash = this.BlockDataHash,
+                nonce = this.Nonce,
+            };
+
+            string blockHash = Crypto.BytesToHex(Crypto.CalcSha256(Crypto.JsonToString(block)));
+            ;
+            return blockHash;
+        }
+
+        private string CalculateBlockDataHash()
+        {
+            string blockDataAsString = this.GetBlockDataPayload();
+            string blockHash = Crypto.BytesToHex(Crypto.CalcSha256(blockDataAsString));
+            return blockHash;
+        }
+
+        private string GetBlockDataPayload()
+        {
+            var blockData = new
+            {
+                index = this.Index,
+                transactions = this.Transactions,
+                dificulty = this.Difficulty,
+                prevBlockHash = this.PreviousBlockHash,
+                createdOn = this.CreatedOn,
+                mineBy = this.MineBy,
+            };
+
+            return Crypto.JsonToString(blockData);
         }
     }
 }

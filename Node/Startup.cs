@@ -30,12 +30,13 @@ namespace Node
         {
             services.AddSingleton(Configuration.GetSection("NodeInfo").Get<NodeInformation>());
             services.AddSingleton<INodeService, NodeService>();
+            services.AddSingleton<IPeerService, PeerService>();
             services.AddSingleton<ITransactionService, TransactionService>();
-            
+
             services.AddAutoMapper();
-            
+
             services.AddCors();
-            
+
             services.AddMvc();
 
             services.AddSwaggerGen(c =>
@@ -46,8 +47,8 @@ namespace Node
                     Version = "v1",
                     Description = "SoftUni Blockchain Node ASP.NET Core REST API",
                     TermsOfService = "None",
-                    Contact = new Contact { Name = "Asen Todorov", Email = "", Url = "" },
-                    License = new License { Name = "", Url = "" }
+                    Contact = new Contact {Name = "Asen Todorov", Email = "", Url = ""},
+                    License = new License {Name = "", Url = ""}
                 });
             });
         }
@@ -64,15 +65,12 @@ namespace Node
             app.UseSwagger();
 
             // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), specifying the Swagger JSON endpoint.
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "SoftUni Blockchain Node V1");
-            });
+            app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "SoftUni Blockchain Node V1"); });
 
             app.UseCors(
                 options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()
-                );
-            
+            );
+
             app.UseMvc();
         }
     }

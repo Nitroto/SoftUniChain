@@ -27,10 +27,5 @@ namespace Node.Controllers
 
             return Ok(infoResource);
         }
-
-//        [HttpGet]
-//        public IActionResult GetAdditionalInformation(string query)
-//        {
-//        }
     }
 }

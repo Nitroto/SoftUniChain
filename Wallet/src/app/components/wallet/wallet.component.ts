@@ -108,7 +108,7 @@ export class WalletComponent implements OnInit {
     this.openSigningDialog(data).subscribe(result => {
       if (result) {
         const address = this.node + '/api/transactions';
-        let transaction$ = this._walletServices.sendSigntTransaction(address, data);
+        let transaction$ = this._walletServices.sendSignedTransaction(address, data);
         form.controls['recipient'].reset();
         form.controls['recipient'].clearValidators();
         form.controls['value'].reset();

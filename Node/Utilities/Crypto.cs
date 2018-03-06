@@ -1,5 +1,7 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Org.BouncyCastle.Asn1.Sec;
 using Org.BouncyCastle.Asn1.X9;
@@ -31,15 +33,21 @@ namespace Node.Utilities
 
         public static ECPoint DecodeECPointFromPublicKey(string input)
         {
-            BigInteger bigInt = new BigInteger(input, 16);
-            byte[] compressedKey = bigInt.ToByteArray();
-            var point = Curve.Curve.DecodePoint(compressedKey);
+            BigInteger privKeyInt = new BigInteger(input, 16);
+            byte[] compressedKey = privKeyInt.ToByteArray();
+            ECPoint point = Curve.Curve.DecodePoint(compressedKey);
             return point;
         }
 
         public static string JsonToString(object obj)
         {
             return JsonConvert.SerializeObject(obj).Replace(" ", "");
+        }
+
+        public static bool ValidateAddress(string address)
+        {
+            Regex reg = new Regex("^[0-9a-f]{40}$");
+            return reg.IsMatch(address);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -40,31 +41,29 @@ namespace Node.Controllers
         [HttpGet]
         public IActionResult GetAllTransactions()
         {
-            return Ok();
+            IEnumerable<Transaction> transactions = this._nodeService.GetTransactions();
+            IEnumerable<TransactionResource> transactionResources =
+                this._mapper.Map<IEnumerable<Transaction>, IEnumerable<TransactionResource>>(transactions);
+            return Ok(transactions);
         }
 
         [HttpPost]
-        public IActionResult AddTransaction([FromBody]TransactionResource receivedTransaction)
+        public IActionResult AddTransaction([FromBody] TransactionResource receivedTransaction)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            if (!this._nodeService.CheckSenderBalance(receivedTransaction.From, receivedTransaction.Value))
-            {
-                return BadRequest("Insufficient funds.");
-            }
+//            if (!this._nodeService.CheckSenderBalance(receivedTransaction.From, receivedTransaction.Value))
+//            {
+//                return BadRequest("Insufficient funds.");
+//            }
 
-            Transaction transaction = new Transaction
-            {
-                From = new Address(receivedTransaction.From),
-                To = new Address(receivedTransaction.To),
-                Value = receivedTransaction.Value,
-                Fee = receivedTransaction.Fee,
-                SenderPublicKey = receivedTransaction.SenderPublicKey,
-                DateCreated = receivedTransaction.DateCreated,
-            };
+            Transaction transaction = new Transaction(new Address(receivedTransaction.From),
+                new Address(receivedTransaction.To), receivedTransaction.Value, receivedTransaction.Fee,
+                receivedTransaction.SenderPublicKey, receivedTransaction.SenderSignature);
+            transaction.DateCreated = receivedTransaction.DateCreated;
 
             transaction.TransactionHash = this._transactionService.CalculateTransactionHash(transaction);
 
@@ -79,8 +78,9 @@ namespace Node.Controllers
             }
 
             this._nodeService.AddTransaction(transaction);
+            TransactionResource resource = this._mapper.Map<Transaction, TransactionResource>(transaction);
 
-            return Ok(transaction.TransactionHash);
+            return Ok(resource);
         }
     }
 }

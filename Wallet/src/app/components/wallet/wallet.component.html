@@ -73,7 +73,7 @@
       </ngx-qrcode>
       <div class="card-block">
         <div *ngIf="user$ | async as user; else noUser">
-          <p>{{ user | json }}</p>
+          <!--<p>{{ user | json }}</p>-->
           <h3 class="card-title">Your balance: <b>{{user.amount | currency:'SUC':'.2-5'}}</b></h3>
         </div>
         <p class="card-text">{{ wallet.address }}</p>
@@ -116,10 +116,10 @@
     </form>
   </div>
 </div>
-
-<!--<div *ngIf="transactions$ | async as transactions">-->
-<!--{{transactions | json}}-->
-<!--</div>-->
+<br/>
+<div *ngFor="let transaction of transactions$ | async">
+  <a [routerLink]="'/transactions/'+ transaction">{{transaction}}<span class="sr-only">(current)</span></a>
+</div>
 
 
 

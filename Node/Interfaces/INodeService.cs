@@ -11,13 +11,16 @@ namespace Node.Interfaces
         Block GetBlock(int index);
 
         Transaction GetTransactionInfo(string hash);
+        IEnumerable<Transaction> GetTransactions(bool confirmed = true, bool pending = true);
         void AddTransaction(Transaction transaction);
+
         IEnumerable<string> GetTransactionsByAddressId(string addressId);
         // TransactionCreatedVM AddTransaction(TransactionVM transaction)
-        
+
         Address GetAddress(string id);
         IEnumerable<Address> GetAllAddresses();
         bool CheckForCollison(string transactionHash);
         bool CheckSenderBalance(string senderId, ulong amount);
+        void AddAddress(Address address);
     }
 }

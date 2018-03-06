@@ -18,8 +18,8 @@ import * as utf8 from 'utf8';
 export class WalletComponent implements OnInit {
 
   customSelection = new FormControl(false);
-  privateKeyPattern = '^[A-Za-z0-9]{64}$';
-  addressPattern = '^[A-Za-z0-9]{40}$';
+  privateKeyPattern = '^[a-f0-9]{64}$';
+  addressPattern = '^[a-f0-9]{40}$';
 
   wallet = {
     privateKey: '',
@@ -55,6 +55,7 @@ export class WalletComponent implements OnInit {
       this.wallet.address = sessionStorage['address'];
       this.transaction.from = sessionStorage['address'];
       this.user$ = this.loadUserDataFromChain();
+      this.getUserTransactions();
     }
   }
 
@@ -108,22 +109,25 @@ export class WalletComponent implements OnInit {
     this.openSigningDialog(data).subscribe(result => {
       if (result) {
         const address = this.node + '/api/transactions';
-        const transaction$ = this._walletServices.sendSignedTransaction(address, data);
-        form.controls['recipient'].reset();
-        form.controls['recipient'].clearValidators();
-        form.controls['value'].reset();
-        form.controls['value'].clearValidators();
-        transaction$.subscribe(transaction => {
+        this._walletServices.sendSignedTransaction(address, data).subscribe(() => {
+          form.controls['recipient'].reset();
+          form.controls['recipient'].clearValidators();
+          form.controls['value'].reset();
+          form.controls['value'].clearValidators();
           this._toastyService.success('Transaction was successfully added to blockchain.', 'Success');
+          this.getUserTransactions();
         }, err => {
+          console.log(err);
           this._toastyService.error('Transaction was unsuccessful.', 'Major Error');
         });
+
       }
     });
   }
 
   private getUserTransactions() {
-
+    const url = this.node + '/api/addresses/' + this.wallet.address + '/transactions';
+    this.transactions$ = this._walletServices.getData(url);
   }
 
   private openSigningDialog(data): Observable<any> {

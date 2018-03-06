@@ -17,7 +17,7 @@
                                 <p class="control has-icon has-icons-left">
                                     <input name="recipient"
                                            v-model="recipient"
-                                           v-validate="'required|regex:^[A-Za-z0-9]{40}$'"
+                                           v-validate="'required|regex:^[a-f0-9]{40}$'"
                                            :class="{'input': true, 'is-danger': errors.has('recipient') }"
                                            type="text"
                                            placeholder="Your blockchain address">

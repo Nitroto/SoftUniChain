@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Node.Interfaces;
 using Node.Models;
+using Node.Utilities;
 
 namespace Node.Services
 {
@@ -72,6 +73,24 @@ namespace Node.Services
             return blocks.Reverse();
         }
 
+        public IEnumerable<Transaction> GetTransactions(bool confirmed = true, bool pending = true)
+        {
+            List<Transaction> confirmedTransactions = new List<Transaction>();
+            if (confirmed)
+            {
+                confirmedTransactions = this._confirmedTransactionsByHash.Values.ToList();
+            }
+
+            List<Transaction> pendingTransactions = new List<Transaction>();
+            if (pending)
+            {
+                pendingTransactions = this._pendingTransactionsByHash.Values.ToList();
+            }
+
+            IEnumerable<Transaction> transactions = confirmedTransactions.Concat(pendingTransactions).ToArray();
+            return transactions;
+        }
+
         public Transaction GetTransactionInfo(string hash)
         {
             if (this._pendingTransactionsByHash.ContainsKey(hash))
@@ -98,6 +117,12 @@ namespace Node.Services
             return (ulong) (this._addresses[senderId].Amount * 1000000) >= amount;
         }
 
+        public void AddAddress(Address address)
+        {
+            this._addresses.TryAdd(address.AddressId, address);
+            this._transactionHashByAddressId.TryAdd(address.AddressId, new List<string>());
+        }
+
         public void AddTransaction(Transaction transaction)
         {
             string hash = transaction.TransactionHash;
@@ -107,8 +132,8 @@ namespace Node.Services
             this.AddTransactionToAddress(transaction.From, hash);
             this.AddTransactionToAddress(transaction.To, hash);
 
-            this.AddAddress(transaction.From);
-            this.AddAddress(transaction.To);
+            this.AddAddressNewAddress(transaction.From);
+            this.AddAddressNewAddress(transaction.To);
         }
 
         public Address GetAddress(string id)
@@ -130,9 +155,12 @@ namespace Node.Services
 
         public IEnumerable<string> GetTransactionsByAddressId(string addressId)
         {
-            return this._transactionHashByAddressId.ContainsKey(addressId)
-                ? this._transactionHashByAddressId[addressId].ToArray()
-                : null;
+            if (this._transactionHashByAddressId.ContainsKey(addressId))
+            {
+                return this._transactionHashByAddressId[addressId].ToArray();
+            }
+
+            return new string[0];
         }
 
         private void AddTransactionToAddress(Address address, string transactionHash)
@@ -145,7 +173,7 @@ namespace Node.Services
             this._transactionHashByAddressId[address.AddressId].Add(transactionHash);
         }
 
-        private void AddAddress(Address address)
+        private void AddAddressNewAddress(Address address)
         {
             if (!this._addresses.ContainsKey(address.AddressId))
             {
@@ -190,18 +218,13 @@ namespace Node.Services
         private void ProcessGenesisBlock()
         {
             if (_genesisBlock != null) return;
-            Transaction faucet = new Transaction()
-            {
-                From = new Address("0000000000000000000000000000000000000000"),
-                To = new Address("bee3f694bf0fbf9556273e85d43f2e521d24835e"),
-                DateCreated = DateTime.Now,
-                Value = 2000000000,
-                Fee = 0,
-                MinedInBlockIndex = 0,
-                TransferSuccessfull = true
-            };
+            Transaction faucet = new Transaction(new Address("0000000000000000000000000000000000000000"),
+                new Address("bee3f694bf0fbf9556273e85d43f2e521d24835e"), 2000000000, 0, "0", new string[2]);
+            faucet.MinedInBlockIndex = 0;
+            faucet.TransferSuccessfull = true;
 
-            this.AddAddress(faucet.To);
+            this._confirmedTransactionsByHash.TryAdd(faucet.TransactionHash, faucet);
+            this.AddAddressNewAddress(faucet.To);
             this._addresses[faucet.To.AddressId].Amount += (long) faucet.Value;
 
             List<Transaction> transactions = new List<Transaction>() {faucet};

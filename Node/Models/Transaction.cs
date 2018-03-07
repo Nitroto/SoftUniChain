@@ -34,7 +34,7 @@ namespace Node.Models
         public string[] SenderSignature { get; set; }
         public string TransactionHash { get; set; }
         public int? MinedInBlockIndex { get; set; }
-        public bool TransferSuccessfull { get; set; }
+        public bool TransferSuccessful { get; set; }
 
         private string CalculateHash()
         {

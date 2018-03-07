@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Node.Interfaces;
 using Node.Models;
 using Node.Services;
@@ -38,6 +33,8 @@ namespace Node
             services.AddCors();
 
             services.AddMvc();
+            services.AddMvcCore()
+                .AddApiExplorer();
 
             services.AddSwaggerGen(c =>
             {
@@ -61,17 +58,22 @@ namespace Node
                 app.UseDeveloperExceptionPage();
             }
 
-            // Enable middleware to serve generated Swagger as a JSON endpoint.
+//             Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
 
-            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), specifying the Swagger JSON endpoint.
+//             Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), specifying the Swagger JSON endpoint.
             app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "SoftUni Blockchain Node V1"); });
 
             app.UseCors(
                 options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()
             );
-
             app.UseMvc();
+//            app.UseMvc(routes =>
+//            {
+//                routes.MapRoute(
+//                    name: "api",
+//                    template: "api/{controller=Values}/{action=GetAll}/{id?}");
+//            });
         }
     }
 }

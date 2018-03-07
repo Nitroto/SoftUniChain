@@ -2,6 +2,8 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Newtonsoft.Json;
 using Node.Interfaces;
 using Node.Models;
 using Node.Utilities;
@@ -11,6 +13,7 @@ namespace Node.Services
     public class NodeService : INodeService
     {
         private static Block _genesisBlock;
+        private static Block _candidate;
         private NodeInformation _nodeInformation;
         private ConcurrentDictionary<string, Peer> _peersByAddress;
         private ConcurrentDictionary<string, Transaction> _confirmedTransactionsByHash;
@@ -19,7 +22,7 @@ namespace Node.Services
         private ConcurrentDictionary<string, IList<string>> _transactionHashByAddressId;
         private ConcurrentDictionary<string, Block> _miningJobs;
 
-        private IList<Block> _blockchain;
+        private ConcurrentBag<Block> _blockchain;
 
         public NodeService(NodeInformation nodeInformation)
         {
@@ -30,8 +33,7 @@ namespace Node.Services
             this._addresses = new ConcurrentDictionary<string, Address>();
             this._transactionHashByAddressId = new ConcurrentDictionary<string, IList<string>>();
             this._miningJobs = new ConcurrentDictionary<string, Block>();
-            // TODO: decide on the collection type, if list introduce locking
-            this._blockchain = new List<Block>();
+            this._blockchain = new ConcurrentBag<Block>();
 
             this.ProcessGenesisBlock();
         }
@@ -60,9 +62,9 @@ namespace Node.Services
                 return null;
             }
 
-            Block block = this._blockchain[index];
+            var block = this._blockchain.FirstOrDefault(b => b.Index == index);
 
-            return block;
+            return _candidate;
         }
 
 
@@ -163,6 +165,17 @@ namespace Node.Services
             return new string[0];
         }
 
+        public Block GetBlockCandidate()
+        {
+            if (this._pendingTransactionsByHash.Count > 0)
+            {
+                IEnumerable<Transaction> transactions = this.ProcessTransactions(GetTransactions(false));
+                _candidate.Transactions = _candidate.Transactions.Concat(transactions);
+            }
+
+            return _candidate;
+        }
+
         private void AddTransactionToAddress(Address address, string transactionHash)
         {
             if (!this._transactionHashByAddressId.ContainsKey(address.AddressId))
@@ -184,25 +197,27 @@ namespace Node.Services
         private void ProcessNewBlock(Block block)
         {
             if (!IsBlockValid(block)) return;
-            this.UpdateCollections(block);
             this._blockchain.Add(block);
+            this.PrepareCandidate();
         }
 
-        private void UpdateCollections(Block block)
+        private IEnumerable<Transaction> ProcessTransactions(IEnumerable<Transaction> transactions)
         {
-//            foreach (Transaction t in block.Transactions)
-//            {
-//                t.From.Amount -= t.Value;
-//                t.To.Amount += t.Value;
-//
-//                t.MinedInBlockIndex = block.Index;
-//
-//                // TODO: What exactly Paid means
-//                t.TransferSuccessfull = true;
-//
-//                this._confirmedTransactionsByHash.TryAdd(t.TransactionHash, t);
-//                this._pendingTransactionsByHash.TryRemove(t.TransactionHash, out var Ignore);
-//            }
+            Transaction[] processTransactions = transactions as Transaction[] ?? transactions.ToArray();
+            foreach (Transaction t in processTransactions)
+            {
+                t.From.Amount -= (long) t.Value;
+                t.To.Amount += (long) t.Value;
+
+                t.MinedInBlockIndex = _candidate.Index;
+                t.TransferSuccessful = true;
+
+                this._confirmedTransactionsByHash.TryAdd(t.TransactionHash, t);
+                this._pendingTransactionsByHash.TryRemove(t.TransactionHash, out var ignore);
+                Console.WriteLine(ignore);
+            }
+
+            return processTransactions;
         }
 
         private bool IsBlockValid(Block block)
@@ -221,21 +236,26 @@ namespace Node.Services
             Transaction faucet = new Transaction(new Address("0000000000000000000000000000000000000000"),
                 new Address("bee3f694bf0fbf9556273e85d43f2e521d24835e"), 2000000000, 0, "0", new string[2]);
             faucet.MinedInBlockIndex = 0;
-            faucet.TransferSuccessfull = true;
+            faucet.TransferSuccessful = true;
 
             this._confirmedTransactionsByHash.TryAdd(faucet.TransactionHash, faucet);
             this.AddAddressNewAddress(faucet.To);
+            this.AddTransactionToAddress(faucet.From, faucet.TransactionHash);
+            this.AddTransactionToAddress(faucet.To, faucet.TransactionHash);
             this._addresses[faucet.To.AddressId].Amount += (long) faucet.Value;
 
             List<Transaction> transactions = new List<Transaction>() {faucet};
-            _genesisBlock = new Block(0, 5, null, new Address("0000000000000000000000000000000000000000"), string.Empty,
-                transactions);
+            _genesisBlock = new Block(0, 5, string.Empty,
+                transactions, new Address("0000000000000000000000000000000000000000"));
 
-            this.ProcessNewBlock(_genesisBlock);
+            this._blockchain.Add(_genesisBlock);
+            this.PrepareCandidate();
         }
 
-        private void AddressGenerator()
+        private void PrepareCandidate()
         {
+            IEnumerable<Transaction> transactions = this.ProcessTransactions(GetTransactions(false));
+            _candidate = new Block(this._blockchain.Count, 5, this._blockchain.Last().BlockHash, transactions);
         }
     }
 }

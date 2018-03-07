@@ -7,8 +7,8 @@ namespace Node.Models
 {
     public class Block
     {
-        public Block(int index, long difficulty, long? nonce, Address mineBy, string previousBlockHash,
-            IEnumerable<Transaction> transactions)
+        public Block(int index, long difficulty, string previousBlockHash, IEnumerable<Transaction> transactions,
+            Address mineBy = null, long? nonce = null)
         {
             this.Index = index;
             this.CreatedOn = DateTime.Now;
@@ -24,12 +24,12 @@ namespace Node.Models
         public int Index { get; private set; }
         public DateTime CreatedOn { get; private set; }
         public long Difficulty { get; private set; }
-        public Address MineBy { get; private set; }
+        public Address MineBy { get; set; }
         public string PreviousBlockHash { get; private set; }
         public string BlockHash { get; private set; }
         public string BlockDataHash { get; private set; }
         public long? Nonce { get; private set; }
-        public IEnumerable<Transaction> Transactions { get; private set; }
+        public IEnumerable<Transaction> Transactions { get; set; }
 
         public string GenerateHash()
         {
@@ -37,6 +37,7 @@ namespace Node.Models
             {
                 blockDataHash = this.BlockDataHash,
                 nonce = this.Nonce,
+                createdOn = this.CreatedOn,
             };
 
             string blockHash = Crypto.BytesToHex(Crypto.CalcSha256(Crypto.JsonToString(block)));
@@ -59,7 +60,6 @@ namespace Node.Models
                 transactions = this.Transactions,
                 dificulty = this.Difficulty,
                 prevBlockHash = this.PreviousBlockHash,
-                createdOn = this.CreatedOn,
                 mineBy = this.MineBy,
             };
 

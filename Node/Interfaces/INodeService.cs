@@ -9,6 +9,7 @@ namespace Node.Interfaces
         NodeInformation GetNodeInfo();
         IEnumerable<Block> GetAllBlocks();
         Block GetBlock(int index);
+        Block GetBlockCandidate();
 
         Transaction GetTransactionInfo(string hash);
         IEnumerable<Transaction> GetTransactions(bool confirmed = true, bool pending = true);

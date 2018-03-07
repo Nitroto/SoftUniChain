@@ -38,14 +38,6 @@ namespace Node.Controllers
             return Ok(addressResource);
         }
 
-        [HttpGet("{id}")]
-        [Route("/api/addresses/{id}/transactions")]
-        public IActionResult GetTransactionsHashesOfAddres(string id)
-        {
-            IEnumerable<string> result = this._nodeService.GetTransactionsByAddressId(id);
-            return Ok(result);
-        }
-
         [HttpGet]
         public IActionResult GetAllAddresses()
         {

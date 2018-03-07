@@ -1,3 +1,4 @@
+import datetime
 import time
 import sys
 import pprint
@@ -11,7 +12,7 @@ pp = pprint.PrettyPrinter(indent=4)
 
 class Miner(object):
     def __init__(self, host, port, payment_address, id):
-        self.url = 'http://' + host + ':' + str(port) + '/api/blocks'
+        self.url = 'http://' + host + ':' + str(port) + '/api/mining/' + payment_address
         self.host = host
         self.port = port
         self.payment_address = payment_address
@@ -34,16 +35,18 @@ class Miner(object):
         if rpc is None:
             return
         block = rpc.get_work()
-        timestamp = time.time().isoformat()
+        print(block)
+        timestamp = datetime.datetime.now().isoformat()
+
         self.difficulty = '0' * block['difficulty'] + '9' * (64 - block['difficulty'])
-        precomputed_data = block['index'] + block['transactionsHash'] + block['prevBlockHash']
+        precomputed_data = str(block['index']) + block['blockDataHash'] + block['previousBlockHash']
         block_found = False
         while not block_found and self.nonce < MAX_NONCE:
             data = precomputed_data + timestamp + str(self.nonce)
-            block_hash = hashlib.sha256(data).hexdigest()
+            block_hash = hashlib.sha256(data.encode('utf-8')).hexdigest()
             if block_hash < self.difficulty:
                 print('!!! Block found !!!')
-                print('!!! Block hash: %s', block_hash)
+                print('!!! Block hash: ', block_hash)
                 result = {
                     'nonce': str(self.nonce),
                     'dateCreated': timestamp,
@@ -55,11 +58,11 @@ class Miner(object):
 
             if self.nonce % 1000000 == 0:
                 print(timestamp)
-                print('Nonce: %s', self.nonce)
-                print('Block Hash: %s', block_hash)
+                print('Nonce: ', self.nonce)
+                print('Block Hash: ', block_hash)
 
             if self.nonce % 100000 == 0:
-                timestamp = time.time().isoformat()
+                timestamp = datetime.datetime.now().isoformat()
 
             self.nonce += 1
 

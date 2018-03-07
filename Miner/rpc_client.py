@@ -32,15 +32,16 @@ class rpc_client:
         self.url = url
 
     def rpc(self, method, params=None):
-        payload = []
+        payload = {}
         if params is not None:
-            payload['params'] = params
+            payload = params
 
+        response = None
         if method == 'get_work':
             response = requests.get(self.url, headers=self.headers, timeout=30)
             # response = FAKE_ANSWER
         else:
-            response = requests.post(self.url, data=json.dumps(payload), headers=self.headers, timeout=30)
+            requests.post(self.url, data=json.dumps(payload), headers=self.headers, timeout=30)
 
         if response is None:
             print("JSON-RPC: not response")
@@ -52,14 +53,11 @@ class rpc_client:
             return None
         if 'error' in resp_obj and resp_obj['error'] is not None:
             return resp_obj['error']
-        if 'content' not in resp_obj:
-            print("JSON-RPC: no result in object")
-            return None
 
-        return resp_obj['content']
+        return resp_obj
 
     def submit_result(self, result):
-        return self.rpc('get_block_count', result)
+        return self.rpc('submit', result)
 
     def get_work(self):
         return self.rpc('get_work')

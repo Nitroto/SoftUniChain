@@ -2,4 +2,4 @@
 
 ## SoftUni Chain Block Explorer (port 3000)
 
-### Ruby on Rails Application with Bootsrap 4 theme
+### React with Bulma CSS Framework

@@ -175,15 +175,6 @@ namespace Node.Services
             return _candidate;
         }
 
-        public bool IsBlockValid(Block block)
-        {
-            // TODO: Validate block index, previous blockhash, BlockHash(based on Nonce, date, BlockDataHash)
-            // TODO: Validate all transactions - if the amounts are available, signature, TransactionHash
-            // TODO: Validate BlockDataHash
-
-            return true;
-        }
-
         public void UpdateBlockchain(Block newBlock)
         {
             this._blockchain.Add(newBlock);
@@ -231,11 +222,14 @@ namespace Node.Services
 
             return processTransactions;
         }
-
-        private void PrepareCandidate()
+        
+        public bool IsBlockValid(Block block)
         {
-            IEnumerable<Transaction> transactions = this.ProcessTransactions(GetTransactions(false));
-            _candidate = new Block(this._blockchain.Count, 5, this._blockchain.Last().BlockHash, transactions);
+            // TODO: Validate block index, previous blockhash, BlockHash(based on Nonce, date, BlockDataHash)
+            // TODO: Validate all transactions - if the amounts are available, signature, TransactionHash
+            // TODO: Validate BlockDataHash
+
+            return true;
         }
 
         private void ProcessGenesisBlock()
@@ -258,6 +252,12 @@ namespace Node.Services
 
             this._blockchain.Add(_genesisBlock);
             this.PrepareCandidate();
+        }
+        
+        private void PrepareCandidate()
+        {
+            IEnumerable<Transaction> transactions = this.ProcessTransactions(GetTransactions(false));
+            _candidate = new Block(this._blockchain.Count, 5, this._blockchain.Last().BlockHash, transactions);
         }
     }
 }

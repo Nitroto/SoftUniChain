@@ -1,0 +1,11 @@
+a.r-item {
+  color: #a0a0a0;
+  padding: 0.5rem 1.75rem; }
+  @media screen and (max-width: 768px) {
+    a.r-item {
+      color: gray; }
+      a.r-item:hover {
+        background-color: #bebebe; } }
+
+.navbar-burger span {
+  background-color: #C1C1C1; }

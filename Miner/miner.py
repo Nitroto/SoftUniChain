@@ -1,5 +1,4 @@
 import datetime
-import time
 import sys
 import pprint
 import hashlib

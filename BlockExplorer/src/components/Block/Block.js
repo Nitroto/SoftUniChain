@@ -1,13 +1,13 @@
 import React, {Component} from 'react';
 
-class Blocks extends Component {
+class Block extends Component {
     render() {
         return (
             <div>
-                Blocks
+                Block
             </div>
         );
     }
 }
 
-export default Blocks;
+export default Block;

@@ -10,13 +10,13 @@ namespace Node.Interfaces
         IEnumerable<Block> GetAllBlocks();
         Block GetBlock(int index);
         Block GetBlockCandidate();
+        bool IsBlockValid(Block block);
+        void UpdateBlockchain(Block confirmedBlock);
 
         Transaction GetTransactionInfo(string hash);
         IEnumerable<Transaction> GetTransactions(bool confirmed = true, bool pending = true);
         void AddTransaction(Transaction transaction);
-
         IEnumerable<string> GetTransactionsByAddressId(string addressId);
-        // TransactionCreatedVM AddTransaction(TransactionVM transaction)
 
         Address GetAddress(string id);
         IEnumerable<Address> GetAllAddresses();

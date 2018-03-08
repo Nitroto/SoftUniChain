@@ -21,7 +21,6 @@ namespace Node.Services
         private ConcurrentDictionary<string, Address> _addresses;
         private ConcurrentDictionary<string, IList<string>> _transactionHashByAddressId;
         private ConcurrentDictionary<string, Block> _miningJobs;
-
         private ConcurrentBag<Block> _blockchain;
 
         public NodeService(NodeInformation nodeInformation)
@@ -176,6 +175,26 @@ namespace Node.Services
             return _candidate;
         }
 
+        public bool IsBlockValid(Block block)
+        {
+            // TODO: Validate block index, previous blockhash, BlockHash(based on Nonce, date, BlockDataHash)
+            // TODO: Validate all transactions - if the amounts are available, signature, TransactionHash
+            // TODO: Validate BlockDataHash
+
+            return true;
+        }
+
+        public void UpdateBlockchain(Block newBlock)
+        {
+            this._blockchain.Add(newBlock);
+            this.PrepareCandidate();
+        }
+
+        private string GetBlockHash(Block block)
+        {
+            return block.BlockHash;
+        }
+
         private void AddTransactionToAddress(Address address, string transactionHash)
         {
             if (!this._transactionHashByAddressId.ContainsKey(address.AddressId))
@@ -192,13 +211,6 @@ namespace Node.Services
             {
                 this._addresses.TryAdd(address.AddressId, address);
             }
-        }
-
-        private void ProcessNewBlock(Block block)
-        {
-            if (!IsBlockValid(block)) return;
-            this._blockchain.Add(block);
-            this.PrepareCandidate();
         }
 
         private IEnumerable<Transaction> ProcessTransactions(IEnumerable<Transaction> transactions)
@@ -220,14 +232,10 @@ namespace Node.Services
             return processTransactions;
         }
 
-        private bool IsBlockValid(Block block)
+        private void PrepareCandidate()
         {
-            // TODO: Validate block index, previous blockhash, BlockHash(based on Nonce, date, BlockDataHash)
-            // TODO: Validate all transactions - if the amounts are available, signature, TransactionHash
-            // Is it possible to have single address 2 times in a block? If yes - will need some kind of temp addresses collection to keep track of the transactions in the block
-            // TODO: Validate BlockDataHash
-
-            return true;
+            IEnumerable<Transaction> transactions = this.ProcessTransactions(GetTransactions(false));
+            _candidate = new Block(this._blockchain.Count, 5, this._blockchain.Last().BlockHash, transactions);
         }
 
         private void ProcessGenesisBlock()
@@ -250,12 +258,6 @@ namespace Node.Services
 
             this._blockchain.Add(_genesisBlock);
             this.PrepareCandidate();
-        }
-
-        private void PrepareCandidate()
-        {
-            IEnumerable<Transaction> transactions = this.ProcessTransactions(GetTransactions(false));
-            _candidate = new Block(this._blockchain.Count, 5, this._blockchain.Last().BlockHash, transactions);
         }
     }
 }

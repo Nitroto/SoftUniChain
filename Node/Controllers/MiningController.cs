@@ -1,5 +1,6 @@
 ﻿using System;
 using AutoMapper;
+using AutoMapper.XpressionMapper.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Node.Interfaces;
 using Node.Models;
@@ -15,6 +16,8 @@ namespace Node.Controllers
 
         public MiningController(IMapper mapper, INodeService nodeService)
         {
+            this._mapper = mapper;
+            this._nodeService = nodeService;
         }
 
         [HttpGet("{address}")]
@@ -27,8 +30,22 @@ namespace Node.Controllers
         }
 
         [HttpPost("{address}")]
-        public IActionResult BlockFound(string address)
+        public IActionResult BlockFound(string address, [FromBody] BlockResource confirmedBlockResource)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            Block confirmedBlock = this._mapper.Map<BlockResource, Block>(confirmedBlockResource);
+
+            if (!this._nodeService.IsBlockValid(confirmedBlock))
+            {
+                return BadRequest("Not valid block");
+            }
+
+            this._nodeService.UpdateBlockchain(confirmedBlock);
+
             return Ok();
         }
     }

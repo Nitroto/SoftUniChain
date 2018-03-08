@@ -14,7 +14,6 @@ namespace Node.Resources
         public string[] SenderSignature { get; set; }
         public string TransactionHash { get; set; }
         public int? MinedInBlockIndex { get; set; }
-        public bool transferSuccessful { get; set; }
-
+        public bool TransferSuccessful { get; set; }
     }
 }

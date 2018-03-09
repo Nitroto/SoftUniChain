@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import './Header.css';
+import Logo from '../../assets/blockchain-logo.png';
 import {Link} from 'react-router-dom';
 
 
@@ -21,11 +22,10 @@ class Header extends Component {
         let menuActive = this.state.isToggleOn ? 'is-active' : '';
 
         return (
-            <nav className="navbar is-info">
+            <nav className="navbar is-light">
                 <div className="navbar-brand">
                     <Link className="navbar-item" to='/'>
-                        <img src="../../assets/blockchain-logo.png" alt="SoftUni blockchain test network" width="100%"
-                             height="28"/>
+                        <img src={Logo} alt="SoftUni blockchain test network" width="100%" height="28"/>
                     </Link>
                     <div className={'navbar-burger burger ' + menuActive} data-target="navbar-main"
                          onClick={this.handleClick}>

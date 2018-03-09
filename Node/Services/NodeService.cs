@@ -63,7 +63,7 @@ namespace Node.Services
 
             var block = this._blockchain.FirstOrDefault(b => b.Index == index);
 
-            return _candidate;
+            return block;
         }
 
 

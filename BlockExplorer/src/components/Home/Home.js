@@ -22,12 +22,12 @@ class Home extends Component {
     }
 
     render() {
-        return <div>
+        return (<div>
             <section className="section">
                 <div className="container">
                     <h1 className="title">Latest Blocks</h1>
                     {this.state.blocks.length > 0 &&
-                    <table className="table has-text-centered is-hoverable" width="100%">
+                    <table className="table has-text-centered is-hoverable is-fullwidth">
                         <thead>
 
                         <tr>
@@ -38,10 +38,14 @@ class Home extends Component {
                         </tr>
                         </thead>
                         <tbody>
-                        {this.state.blocks.reverse().map(block =>
-                            <tr>
-                                <td><Link to={'/blocks/' + block.blockHash}>{block.index}</Link></td>
-                                <td><Moment fromNow ago>{block.createdOn}</Moment></td>
+                        {this.state.blocks.reverse().slice(-10).map(block =>
+                            <tr key={block.index}>
+                                <td>
+                                    <Link to={'/blocks/' + block.blockHash}>{block.index}</Link>
+                                </td>
+                                <td>
+                                    <Moment fromNow ago>{block.createdOn}</Moment>
+                                </td>
                                 <td>{block.transactions.length}</td>
                                 <td>{block.blockHash}</td>
                             </tr>
@@ -50,7 +54,7 @@ class Home extends Component {
                     </table>}
                 </div>
             </section>
-        </div>;
+        </div>);
     }
 }
 

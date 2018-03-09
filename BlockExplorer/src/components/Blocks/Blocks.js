@@ -3,6 +3,7 @@ import './Block.sass';
 import axios from 'axios/index';
 import Moment from 'react-moment';
 import {Link} from 'react-router-dom';
+import Currency from 'react-currency-formatter';
 
 class Blocks extends Component {
     constructor(props) {
@@ -12,6 +13,16 @@ class Blocks extends Component {
             blocks: [],
             now: new Date()
         };
+
+        this.sumValuesOfTransactions = this.sumValuesOfTransactions.bind(this)
+    }
+
+    sumValuesOfTransactions(transactions) {
+        let sum = 0;
+        transactions.forEach(function (tx) {
+            sum += tx.value
+        });
+        return sum / 1000000
     }
 
     componentDidMount() {
@@ -45,7 +56,13 @@ class Blocks extends Component {
                                         <Moment fromNow ago>{block.createdOn}</Moment>
                                     </td>
                                     <td>{block.transactions.length}</td>
-                                    <td>{block.blockHash}</td>
+                                    <td>
+                                        <Currency
+                                            quantity={this.sumValuesOfTransactions(block.transactions)}
+                                            pattern="##,###.00### !"
+                                            symbol="SUC"
+                                            decimal="."/>
+                                    </td>
                                 </tr>
                             )}
                             </tbody>

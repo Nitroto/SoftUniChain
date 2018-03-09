@@ -19,7 +19,7 @@ class App extends Component {
                 <Route exact={true} path="/blocks" component={Blocks}/>
                 <Route exact={true} path="/blocks/:id" component={Block}/>
                 <Route exact={true} path="/transactions/:id" component={Transaction}/>
-                <Route exact={true} path="/addresses/:id" component={Address}/>
+                <Route exact={true} path="/address/:id" component={Address}/>
 
                 <Footer/>
             </div>

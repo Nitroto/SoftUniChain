@@ -3,6 +3,7 @@ import './Home.sass';
 import axios from 'axios';
 import Moment from 'react-moment';
 import {Link} from 'react-router-dom';
+import Currency from 'react-currency-formatter';
 
 class Home extends Component {
     constructor(props) {
@@ -12,6 +13,7 @@ class Home extends Component {
             blocks: [],
             now: new Date()
         };
+        this.sumValuesOfTransactions = this.sumValuesOfTransactions.bind(this)
     }
 
     componentDidMount() {
@@ -19,6 +21,14 @@ class Home extends Component {
             const blocks = res.data;
             this.setState({blocks});
         })
+    }
+
+    sumValuesOfTransactions(transactions) {
+        let sum = 0;
+        transactions.forEach(function (tx) {
+            sum += tx.value
+        });
+        return sum / 1000000
     }
 
     render() {
@@ -41,13 +51,19 @@ class Home extends Component {
                         {this.state.blocks.reverse().slice(-10).map(block =>
                             <tr key={block.index}>
                                 <td>
-                                    <Link to={'/blocks/' + block.blockHash}>{block.index}</Link>
+                                    <Link to={'/blocks/' + block.index}>{block.index}</Link>
                                 </td>
                                 <td>
                                     <Moment fromNow ago>{block.createdOn}</Moment>
                                 </td>
                                 <td>{block.transactions.length}</td>
-                                <td>{block.blockHash}</td>
+                                <td>
+                                    <Currency
+                                        quantity={this.sumValuesOfTransactions(block.transactions)}
+                                        pattern="##,###.00### !"
+                                        symbol="SUC"
+                                        decimal="."/>
+                                </td>
                             </tr>
                         )}
                         </tbody>

@@ -31,7 +31,7 @@ namespace Node.Controllers
             }
 
             BlockResource blockResource = this._mapper.Map<Block, BlockResource>(block);
-
+            Console.WriteLine(blockResource.Index);
             return Ok(block);
         }
 

@@ -15,5 +15,10 @@ namespace Node.Resources
         public string TransactionHash { get; set; }
         public int? MinedInBlockIndex { get; set; }
         public bool TransferSuccessful { get; set; }
+
+        public override string ToString()
+        {
+            return TransactionHash;
+        }
     }
 }

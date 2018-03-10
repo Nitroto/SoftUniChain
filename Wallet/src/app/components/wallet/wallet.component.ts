@@ -1,13 +1,14 @@
-import {Component, Inject, OnInit} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from '@angular/material';
-import {WalletService} from '../../services/wallet.service';
-import {FormControl, NgForm} from '@angular/forms';
-import {Observable} from 'rxjs/Observable';
-import {ToastrService} from 'ngx-toastr';
+import { Component, Inject, OnInit } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef, MatTableModule } from '@angular/material';
+import { WalletService } from '../../services/wallet.service';
+import { FormControl, NgForm } from '@angular/forms';
+import { Observable } from 'rxjs/Observable';
+import { ToastrService } from 'ngx-toastr';
 
 import * as elliptic from 'elliptic';
 import * as hashes from 'jshashes';
 import * as utf8 from 'utf8';
+import {Transaction} from './transaction';
 
 
 @Component({
@@ -35,9 +36,9 @@ export class WalletComponent implements OnInit {
   };
 
   node = 'http://localhost:5000';
-  info$: any;
-  transactions$: any;
-  user$: any;
+  info$: Observable<any[]>;
+  transactions$: Observable<Transaction[]>;
+  user$: Observable<any[]>;
 
   constructor(public dialog: MatDialog, private _walletServices: WalletService, private _toastyService: ToastrService) {
   }
@@ -82,7 +83,7 @@ export class WalletComponent implements OnInit {
   }
 
   loadUserDataFromChain(): Observable<any> {
-    const address = this.node + '/api/addresses/' + this.wallet.address;
+    const address = this.node + '/api/address/' + this.wallet.address;
     return this._walletServices.getData(address);
   }
 
@@ -120,13 +121,12 @@ export class WalletComponent implements OnInit {
           console.log(err);
           this._toastyService.error('Transaction was unsuccessful.', 'Major Error');
         });
-
       }
     });
   }
 
   private getUserTransactions() {
-    const url = this.node + '/api/addresses/' + this.wallet.address + '/transactions';
+    const url = this.node + '/api/address/' + this.wallet.address + '/transactions';
     this.transactions$ = this._walletServices.getData(url);
   }
 
@@ -165,4 +165,11 @@ export class TransactionContentDialog {
   onNoClick(): void {
     this.dialogRef.close();
   }
+}
+
+export interface Element {
+  name: string;
+  position: number;
+  weight: number;
+  symbol: string;
 }

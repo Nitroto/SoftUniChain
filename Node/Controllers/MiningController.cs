@@ -1,4 +1,6 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Reflection.PortableExecutable;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Node.Interfaces;
 using Node.Models;
@@ -22,27 +24,36 @@ namespace Node.Controllers
         public IActionResult GetCandidate(string address)
         {
             Block candidateBlock = this._nodeService.GetBlockCandidate();
-            candidateBlock.MineBy = this._nodeService.GetAddress(address);
+            this._nodeService.AddMiningJob(address, candidateBlock);
+            candidateBlock.MinedBy = this._nodeService.GetAddress(address).AddressId;
             BlockResource candidateResource = this._mapper.Map<Block, BlockResource>(candidateBlock);
             return Ok(candidateResource);
         }
 
         [HttpPost("{address}")]
-        public IActionResult BlockFound(string address, [FromBody] BlockResource confirmedBlockResource)
+        public IActionResult BlockFound(string address, [FromBody] BlockResource confirmation)
         {
             if (!ModelState.IsValid)
             {
+                Console.WriteLine("shit");
                 return BadRequest(ModelState);
             }
 
-            Block confirmedBlock = this._mapper.Map<BlockResource, Block>(confirmedBlockResource);
-
-            if (!this._nodeService.IsBlockValid(confirmedBlock))
+            Block lastMiningBlock = this._nodeService.GetMiningJob(address);
+            lastMiningBlock.MinedBy = address;
+            lastMiningBlock.Nonce = confirmation.Nonce;
+            lastMiningBlock.BlockHash = confirmation.BlockHash;
+            lastMiningBlock.CreatedOn = DateTime.Parse(confirmation.CreatedOn);
+            
+//            Block confirmedBlock = this._mapper.Map<BlockResource, Block>(confirmedBlockResource);
+            if (!this._nodeService.IsBlockValid(lastMiningBlock))
             {
                 return BadRequest("Not valid block");
             }
 
-            this._nodeService.UpdateBlockchain(confirmedBlock);
+            this._nodeService.PayForBlock(address);
+
+            this._nodeService.UpdateBlockchain(lastMiningBlock);
 
             return Ok();
         }

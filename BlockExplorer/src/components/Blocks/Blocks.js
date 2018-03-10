@@ -49,9 +49,11 @@ class Blocks extends Component {
                             </tr>
                             </thead>
                             <tbody>
-                            {this.state.blocks.reverse().map(block =>
+                            {this.state.blocks.sort(function (a, b) {
+                                return b.index - a.index
+                            }).map(block =>
                                 <tr key={block.index}>
-                                    <td><Link to={'/blocks/' + block.blockHash}>{block.index}</Link></td>
+                                    <td><Link to={'/blocks/' + block.index}>{block.index}</Link></td>
                                     <td>
                                         <Moment fromNow ago>{block.createdOn}</Moment>
                                     </td>

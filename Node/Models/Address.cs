@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using Node.Utilities;
 
 namespace Node.Models
@@ -8,9 +9,10 @@ namespace Node.Models
     {
         private string _addressId;
 
-        public Address(string addressId)
+        public Address(string addressId = null)
         {
             this.AddressId = addressId;
+            this.Transactions = new List<Transaction>();
         }
 
         public string AddressId
@@ -28,6 +30,8 @@ namespace Node.Models
         }
 
         public long Amount { get; set; }
+
+        public IList<Transaction> Transactions { get; set; }
 
         public override string ToString()
         {

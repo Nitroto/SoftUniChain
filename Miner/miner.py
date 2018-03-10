@@ -48,7 +48,7 @@ class Miner(object):
                 print('!!! Block hash: ', block_hash)
                 result = {
                     'nonce': str(self.nonce),
-                    'dateCreated': timestamp,
+                    'createdOn': timestamp,
                     'blockHash': block_hash
                 }
                 block_found = True

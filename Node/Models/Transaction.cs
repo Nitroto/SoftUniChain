@@ -11,12 +11,11 @@ namespace Node.Models
     public class Transaction
     {
         private const int FEE = 20;
-        private string _transactionData;
 
         public Transaction(Address from, Address to, ulong value, uint fee, string senderPublicKey, string[] senderSignature)
         {
-            this.From = from;
-            this.To = to;
+            this.From = from.AddressId;
+            this.To = to.AddressId;
             this.Value = value;
             this.Fee = fee;
             this.DateCreated = DateTime.Now;
@@ -25,8 +24,8 @@ namespace Node.Models
             this.TransactionHash = CalculateHash();
         }
 
-        public Address From { get; set; }
-        public Address To { get; set; }
+        public string From { get; set; }
+        public string To { get; set; }
         public ulong Value { get; set; }
         public uint Fee { get; set; }
         public DateTime DateCreated { get; set; }
@@ -40,8 +39,8 @@ namespace Node.Models
         {
             var payload = new
             {
-                from = this.From.AddressId,
-                to = this.To.AddressId,
+                from = this.From,
+                to = this.To,
                 dateCreated = this.DateCreated,
                 value = this.Value,
                 fee = this.Fee,

@@ -8,7 +8,8 @@ using Node.Resources;
 
 namespace Node.Controllers
 {
-    [Route("/api/addresses")]
+    [Produces("application/json")]
+    [Route("/api/address")]
     public class AddressController : Controller
     {
         // GET
@@ -21,23 +22,6 @@ namespace Node.Controllers
             this._nodeService = nodeService;
         }
 
-        [HttpGet("{id}")]
-        public IActionResult GetAddress(string id)
-        {
-            var address = this._nodeService.GetAddress(id);
-
-            if (address == null)
-            {
-                Address newAddress = new Address(id);
-                this._nodeService.AddAddress(newAddress);
-            }
-
-            var addressResource = this._mapper.Map<Address, AddressResource>(address);
-            addressResource.Transactions = this._nodeService.GetTransactionsByAddressId(id);
-
-            return Ok(addressResource);
-        }
-
         [HttpGet]
         public IActionResult GetAllAddresses()
         {
@@ -46,6 +30,40 @@ namespace Node.Controllers
             var addressesResource = this._mapper.Map<IEnumerable<Address>, IEnumerable<AddressResource>>(addresses);
 
             return Ok(addressesResource);
+        }
+
+        [HttpGet("{address}")]
+        public IActionResult GetAddress(string address)
+        {
+            var addr = this._nodeService.GetAddress(address);
+
+            if (addr == null)
+            {
+                Address newAddress = new Address(address);
+                this._nodeService.AddAddress(newAddress);
+            }
+
+            var addressResource = this._mapper.Map<Address, AddressResource>(addr);
+
+            return Ok(addressResource);
+        }
+
+        [HttpGet("{address}/transactions")]
+        public IActionResult GetAddressTransactions(string address)
+        {
+            var addr = this._nodeService.GetAddress(address);
+
+            if (addr == null)
+            {
+                Address newAddress = new Address(address);
+                this._nodeService.AddAddress(newAddress);
+            }
+
+            IEnumerable<Transaction> transactions = this._nodeService.GetTransactionsByAddressId(address);
+            IEnumerable<TransactionResource> transactionsResources =
+                this._mapper.Map<IEnumerable<Transaction>, IEnumerable<TransactionResource>>(transactions);
+
+            return Ok(transactionsResources);
         }
     }
 }

@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using Node.Interfaces;
 using Node.Models;
 using Node.Services;
@@ -32,6 +34,11 @@ namespace Node
             services.AddCors();
 
             services.AddMvc();
+//                .AddJsonOptions(options =>
+//            {
+//                options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+//                options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+//            });
             services.AddMvcCore()
                 .AddApiExplorer();
 
@@ -67,12 +74,6 @@ namespace Node
                 options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()
             );
             app.UseMvc();
-//            app.UseMvc(routes =>
-//            {
-//                routes.MapRoute(
-//                    name: "api",
-//                    template: "api/{controller=Values}/{action=GetAll}/{id?}");
-//            });
         }
     }
 }

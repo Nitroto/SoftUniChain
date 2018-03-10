@@ -5,9 +5,11 @@ import { RouterModule } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, PatternValidator, ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule, MatCheckboxModule, MatDialogModule,
+import {
+  MatButtonModule, MatCardModule, MatCheckboxModule, MatDialogModule,
   MatExpansionModule, MatFormFieldModule, MatGridListModule,
-  MatIconModule, MatSelectModule } from '@angular/material';
+  MatIconModule, MatSelectModule
+} from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgxQRCodeModule} from '@techiediaries/ngx-qrcode';
 import { ToastrModule } from 'ngx-toastr';
@@ -41,6 +43,8 @@ import { WalletService } from './services/wallet.service';
     MatSelectModule,
     MatDialogModule,
     MatCheckboxModule,
+    MatCardModule,
+    MatGridListModule,
     MatFormFieldModule,
     NgbModule.forRoot(),
     ToastrModule.forRoot({

@@ -5,7 +5,8 @@
             <div class="faucet">
                 <section class="section">
                     <div class="has-text-centered">
-                        <h1><strong>Balance: {{ balance | currency('', 0) }} SUC</strong></h1>
+                        <h1><strong>Balance: {{ balance | currency('SUC', 0, { symbolOnLeft: false,
+                            spaceBetweenAmountAndSymbol: true }) }}</strong></h1>
                     </div>
 
                     <div class="container">
@@ -70,24 +71,46 @@
                     </div>
                 </section>
 
-                <table class="table is-striped is-fullwidth" v-if="transactions.length > 0">
+                <table class="table is-striped is-fullwidth" v-for="transaction of transactions"
+                       :key="transaction.transactionHash">
                     <thead>
-                        <tr>
-                            <th>Transaction</th>
-                        </tr>
+                    <tr v-bind:bgcolor="transaction.transferSuccessful ? '#d0f0c0' : '#ffd9e0'">
+                        <th colspan="2"><abbr title="Hashes"></abbr>
+                            <a v-bind:href="'http://localhost:3000/transactions/' +transaction.transactionHash">{{transaction.transactionHash}}</a>
+                        </th>
+                        <th><abbr title="Date Created"></abbr>{{transaction.dateCreated | moment("dddd, MMMM Do YYYY")}}
+                        </th>
+                    </tr>
                     </thead>
-
                     <tbody>
-                        <tr v-for="transaction of transactions" :key="transaction.hash">
-                            <td>
-                                <a href="transaction.url">{{ transaction.hash }}</a>
-                            </td>
-                        </tr>
+                    <tr>
+                        <td>
+                            <a v-bind:href="'http://localhost:3000/address/'+ transaction.from">{{transaction.from}}</a>
+                        </td>
+                        <td>
+                            <span class='icon'>
+                                <i class='fas fa-arrow-right successful'></i>
+                            </span>
+                        </td>
+                        <td>
+                            <a v-bind:href="'http://localhost:3000/address/' + transaction.to">{{transaction.to}}</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">Amount:</td>
+                        <td>{{transaction.value | currency('&mu;SUC', 0, { symbolOnLeft: false,
+                            spaceBetweenAmountAndSymbol: true })}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colSpan="2">Fee:</td>
+                        <td>{{transaction.fee | currency('&mu;SUC', 0, { symbolOnLeft: false,
+                            spaceBetweenAmountAndSymbol: true })}}
+                        </td>
+                    </tr>
                     </tbody>
                 </table>
             </div>
-
-
         </div>
         <div class="column"></div>
     </div>
@@ -107,7 +130,7 @@
             VueRecaptcha
         },
         created: function () {
-            let url = this.nodeUrl + '/api/addresses/' + this.address;
+            let url = this.nodeUrl + '/api/address/' + this.address;
             this.$http.get(url, {
                 headers: {
                     'Content-Type': 'application/json',
@@ -168,7 +191,7 @@
                     }
                 }).then(result => {
                     this.$toastr('success', 'You received 1 SUC.', 'Success');
-                    this.transactions.push({hash: result.body, url: this.nodeUrl + '/api/transactions/' + result.body});
+                    this.transactions.push(result.body);
                     this.recipient = '';
                     this.resetForm();
                 }, () => {
@@ -188,5 +211,4 @@
 
 <style lang="sass">
     @import "../mq"
-
 </style>

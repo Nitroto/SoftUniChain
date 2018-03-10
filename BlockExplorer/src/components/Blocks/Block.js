@@ -11,7 +11,6 @@ class Block extends Component {
 
         this.state = {
             block: {
-                mineBy: {},
                 transactions: []
             },
             nextBlock: ''
@@ -72,8 +71,8 @@ class Block extends Component {
                                 <tr>
                                     <td>Relayed By</td>
                                     <td>
-                                        <Link to={'/address/' + this.state.block.mineBy.addressId}>
-                                            {this.state.block.mineBy.addressId}
+                                        <Link to={'/address/' + this.state.block.minedBy}>
+                                            {this.state.block.minedBy}
                                         </Link>
                                     </td>
                                 </tr>
@@ -112,21 +111,21 @@ class Block extends Component {
                                 <tr>
                                     <td>Hash</td>
                                     <td>
-                                        <Link to={'/blocks/' + this.state.block.index}>
+                                        <Link onClick={this.forceUpdate} to={'/blocks/' + this.state.block.index}>
                                             {this.state.block.blockHash}
                                         </Link>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>Previous Block</td>
-                                    <td><Link to={'/blocks/' + (this.state.block.index + 1)}>
+                                    <td><Link onClick={this.forceUpdate} to={'/blocks/' + (this.state.block.index - 1)}>
                                         {this.state.block.previousBlockHash}
                                     </Link>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td>Next Block(s)</td>
-                                    <td>{this.state.nextBlock}</td>
+                                    <td><Link onClick={this.forceUpdate} to={'/blocks/'+ (this.state.block.index + 1)}>{this.state.nextBlock}</Link></td>
                                 </tr>
                                 </tbody>
                             </table>
@@ -155,8 +154,8 @@ class Block extends Component {
                                 <tbody>
                                 <tr>
                                     <td>
-                                        <Link to={'/address/' + tx.from.addressId}>
-                                            {tx.from.addressId}
+                                        <Link to={'/address/' + tx.from}>
+                                            {tx.from}
                                         </Link>
                                     </td>
                                     <td>
@@ -165,8 +164,8 @@ class Block extends Component {
                                     </span>
                                     </td>
                                     <td>
-                                        <Link to={'/address/' + tx.to.addressId}>
-                                            {tx.to.addressId}
+                                        <Link to={'/address/' + tx.to}>
+                                            {tx.to}
                                         </Link>
                                     </td>
                                 </tr>

@@ -117,10 +117,48 @@
   </div>
 </div>
 <br/>
-<div *ngFor="let transaction of transactions$ | async">
-  <a [routerLink]="'/transactions/'+ transaction">{{transaction}}<span class="sr-only">(current)</span></a>
-</div>
 
+<div *ngFor="let tx of transactions$ | async">
+  <mat-card>
+    <mat-card-header [style.background]="tx.transferSuccessful ? '#dcedc8':'#ffcdd2'">
+      <mat-card-title>Transaction</mat-card-title>
+      <mat-card-subtitle class="text-center">
+        <a href="http://localhost:3000/api/transactions/{{tx.transactionHash}}">{{tx.transactionHash}}</a>
+      </mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <mat-grid-list cols="2" rowHeight="2rem">
+        <mat-grid-tile
+          [colspan]="1">
+          From:
+        </mat-grid-tile>
+        <mat-grid-tile
+          [colspan]="1">
+          To:
+        </mat-grid-tile>
+      </mat-grid-list>
+      <mat-grid-list cols="5" rowHeight="2rem">
+        <mat-grid-tile
+          [colspan]="2">
+          <a href="http://localhost:3000/api/address/{{tx.from}}">{{tx.from}}</a>
+        </mat-grid-tile>
+        <mat-grid-tile
+          [colspan]="1">
+          <span><mat-icon>marrow_forward</mat-icon></span>
+        </mat-grid-tile>
+        <mat-grid-tile
+          [colspan]="2">
+          <a class="pull-right" href="http://localhost:3000/api/address/{{tx.to}}">{{tx.to}}</a>
+        </mat-grid-tile>
+      </mat-grid-list>
+      <div class="text-center">
+        <p>Amount: {{tx.value | currency:'&mu;SUC':'.#'}}</p>
+        <p>Fee: {{tx.fee | currency:'&mu;SUC':'.#'}}</p>
+        <p>Total: {{(tx.fee + tx.value) | currency:'&mu;SUC':'.#'}}</p>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
 
 
 

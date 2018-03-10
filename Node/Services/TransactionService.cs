@@ -1,13 +1,9 @@
-﻿using Newtonsoft.Json;
-using Node.Interfaces;
+﻿using Node.Interfaces;
 using Node.Models;
 using Node.Utilities;
-using Org.BouncyCastle.Asn1.Sec;
-using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Crypto.Digests;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Crypto.Signers;
-using Org.BouncyCastle.Math;
 
 namespace Node.Services
 {
@@ -46,8 +42,8 @@ namespace Node.Services
         {
             var transactionData = new
             {
-                from = transaction.From.AddressId,
-                to = transaction.To.AddressId,
+                from = transaction.From,
+                to = transaction.To,
                 senderPublicKey = transaction.SenderPublicKey,
                 value = transaction.Value,
                 fee = transaction.Fee,

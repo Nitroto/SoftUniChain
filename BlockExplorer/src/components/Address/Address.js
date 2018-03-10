@@ -20,16 +20,16 @@ class Address extends Component {
     }
 
     componentDidMount() {
-        axios.get('http://localhost:5000/api/addresses/' + this.props.match.params.id).then(res => {
+        axios.get('http://localhost:5000/api/address/' + this.props.match.params.id).then(res => {
             const address = res.data;
             this.setState({address});
             const validAddress = true;
             this.setState({validAddress});
         });
-        // axios.get('http://localhost:5000/api/addresse/transactions' + this.props.match.params.id).then(res => {
-        //     const userTransactions = res.data;
-        //     this.setState({userTransactions});
-        // });
+        axios.get('http://localhost:5000/api/address/' + this.props.match.params.id + '/transactions').then(res => {
+            const userTransactions = res.data;
+            this.setState({userTransactions});
+        });
     }
 
     render() {
@@ -117,8 +117,8 @@ class Address extends Component {
                                 <tbody>
                                 <tr>
                                     <td>
-                                        <Link to={'/address/' + tx.from.addressId}>
-                                            {tx.from.addressId}
+                                        <Link onClick={this.forceUpdate} to={'/address/' + tx.from}>
+                                            {tx.from}
                                         </Link>
                                     </td>
                                     <td>
@@ -127,8 +127,8 @@ class Address extends Component {
                                     </span>
                                     </td>
                                     <td>
-                                        <Link to={'/address/' + tx.to.addressId}>
-                                            {tx.to.addressId}
+                                        <Link onClick={this.forceUpdate} to={'/address/' + tx.to}>
+                                            {tx.to}
                                         </Link>
                                     </td>
                                 </tr>

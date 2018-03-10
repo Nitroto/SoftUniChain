@@ -12,6 +12,9 @@ namespace Node.Services
 {
     public class NodeService : INodeService
     {
+        private Address FirstAddress = new Address("0000000000000000000000000000000000000000");
+        private const int Order = 1000000;
+        private const int BlockReward = 5000000;
         private static Block _genesisBlock;
         private static Block _candidate;
         private NodeInformation _nodeInformation;
@@ -19,7 +22,6 @@ namespace Node.Services
         private ConcurrentDictionary<string, Transaction> _confirmedTransactionsByHash;
         private ConcurrentDictionary<string, Transaction> _pendingTransactionsByHash;
         private ConcurrentDictionary<string, Address> _addresses;
-        private ConcurrentDictionary<string, IList<string>> _transactionHashByAddressId;
         private ConcurrentDictionary<string, Block> _miningJobs;
         private ConcurrentBag<Block> _blockchain;
 
@@ -30,7 +32,6 @@ namespace Node.Services
             this._confirmedTransactionsByHash = new ConcurrentDictionary<string, Transaction>();
             this._pendingTransactionsByHash = new ConcurrentDictionary<string, Transaction>();
             this._addresses = new ConcurrentDictionary<string, Address>();
-            this._transactionHashByAddressId = new ConcurrentDictionary<string, IList<string>>();
             this._miningJobs = new ConcurrentDictionary<string, Block>();
             this._blockchain = new ConcurrentBag<Block>();
 
@@ -66,7 +67,6 @@ namespace Node.Services
             return block;
         }
 
-
         public IEnumerable<Block> GetAllBlocks()
         {
             var blocks = this._blockchain;
@@ -74,22 +74,40 @@ namespace Node.Services
             return blocks.Reverse();
         }
 
-        public IEnumerable<Transaction> GetTransactions(bool confirmed = true, bool pending = true)
+        public Block GetBlockCandidate()
         {
-            List<Transaction> confirmedTransactions = new List<Transaction>();
-            if (confirmed)
+            if (this._pendingTransactionsByHash.Count > 0)
             {
-                confirmedTransactions = this._confirmedTransactionsByHash.Values.ToList();
+                IEnumerable<Transaction> transactions = this.ProcessTransactions(GetTransactions(false));
+                _candidate.Transactions = _candidate.Transactions.Concat(transactions);
             }
 
-            List<Transaction> pendingTransactions = new List<Transaction>();
-            if (pending)
-            {
-                pendingTransactions = this._pendingTransactionsByHash.Values.ToList();
-            }
+            return _candidate;
+        }
+
+        public IEnumerable<Transaction> GetTransactions(bool confirmed = true, bool pending = true)
+        {
+            IList<Transaction> confirmedTransactions = confirmed
+                ? confirmedTransactions = this._confirmedTransactionsByHash.Values.ToList()
+                : new List<Transaction>();
+
+            IList<Transaction>
+                pendingTransactions =
+                    pending ? this._pendingTransactionsByHash.Values.ToList() : new List<Transaction>();
 
             IEnumerable<Transaction> transactions = confirmedTransactions.Concat(pendingTransactions).ToArray();
             return transactions;
+        }
+
+        public void PayForBlock(string address)
+        {
+            Address addr = this.GetAddress(address);
+
+            Transaction reward = new Transaction(FirstAddress, addr, BlockReward, 0, string.Empty, new string[2]);
+            this._pendingTransactionsByHash.TryAdd(reward.TransactionHash, reward);
+            
+            this.AddTransactionToAddress(reward.From, reward);
+            this.AddTransactionToAddress(reward.To, reward);
         }
 
         public Transaction GetTransactionInfo(string hash)
@@ -100,41 +118,6 @@ namespace Node.Services
             }
 
             return this._confirmedTransactionsByHash.ContainsKey(hash) ? this._confirmedTransactionsByHash[hash] : null;
-        }
-
-        public bool CheckForCollison(string transactionHash)
-        {
-            return (this._pendingTransactionsByHash.ContainsKey(transactionHash) ||
-                    this._confirmedTransactionsByHash.ContainsKey(transactionHash));
-        }
-
-        public bool CheckSenderBalance(string senderId, ulong amount)
-        {
-            if (!this._addresses.ContainsKey(senderId))
-            {
-                return false;
-            }
-
-            return (ulong) (this._addresses[senderId].Amount * 1000000) >= amount;
-        }
-
-        public void AddAddress(Address address)
-        {
-            this._addresses.TryAdd(address.AddressId, address);
-            this._transactionHashByAddressId.TryAdd(address.AddressId, new List<string>());
-        }
-
-        public void AddTransaction(Transaction transaction)
-        {
-            string hash = transaction.TransactionHash;
-
-            this._pendingTransactionsByHash.TryAdd(hash, transaction);
-
-            this.AddTransactionToAddress(transaction.From, hash);
-            this.AddTransactionToAddress(transaction.To, hash);
-
-            this.AddAddressNewAddress(transaction.From);
-            this.AddAddressNewAddress(transaction.To);
         }
 
         public Address GetAddress(string id)
@@ -154,25 +137,14 @@ namespace Node.Services
             return this._addresses.Values.ToArray();
         }
 
-        public IEnumerable<string> GetTransactionsByAddressId(string addressId)
+        public IEnumerable<Transaction> GetTransactionsByAddressId(string addressId)
         {
-            if (this._transactionHashByAddressId.ContainsKey(addressId))
+            if (this._addresses.ContainsKey(addressId))
             {
-                return this._transactionHashByAddressId[addressId].ToArray();
+                return this._addresses[addressId].Transactions.ToArray();
             }
 
-            return new string[0];
-        }
-
-        public Block GetBlockCandidate()
-        {
-            if (this._pendingTransactionsByHash.Count > 0)
-            {
-                IEnumerable<Transaction> transactions = this.ProcessTransactions(GetTransactions(false));
-                _candidate.Transactions = _candidate.Transactions.Concat(transactions);
-            }
-
-            return _candidate;
+            return null;
         }
 
         public void UpdateBlockchain(Block newBlock)
@@ -181,26 +153,81 @@ namespace Node.Services
             this.PrepareCandidate();
         }
 
-        private string GetBlockHash(Block block)
+        public bool CheckForCollison(string transactionHash)
         {
-            return block.BlockHash;
+            return (this._pendingTransactionsByHash.ContainsKey(transactionHash) ||
+                    this._confirmedTransactionsByHash.ContainsKey(transactionHash));
         }
 
-        private void AddTransactionToAddress(Address address, string transactionHash)
+        public bool CheckSenderBalance(string senderId, ulong amount)
         {
-            if (!this._transactionHashByAddressId.ContainsKey(address.AddressId))
+            if (senderId == FirstAddress.AddressId)
             {
-                this._transactionHashByAddressId.TryAdd(address.AddressId, new List<string>());
+                return true;
             }
 
-            this._transactionHashByAddressId[address.AddressId].Add(transactionHash);
+            if (!this._addresses.ContainsKey(senderId))
+            {
+                return false;
+            }
+
+            return (ulong) (this._addresses[senderId].Amount * Order) >= amount;
         }
 
-        private void AddAddressNewAddress(Address address)
+        public void AddAddress(Address address)
         {
-            if (!this._addresses.ContainsKey(address.AddressId))
+            this._addresses.TryAdd(address.AddressId, address);
+        }
+
+        public void AddMiningJob(string address, Block block)
+        {
+            if (!this._miningJobs.ContainsKey(address))
             {
-                this._addresses.TryAdd(address.AddressId, address);
+                this._miningJobs.TryAdd(address, block);
+            }
+            else
+            {
+                this._miningJobs[address] = block;
+            }
+        }
+
+        public Block GetMiningJob(string address)
+        {
+            if (!this._miningJobs.ContainsKey(address))
+            {
+                return null;
+            }
+
+            return this._miningJobs[address];
+        }
+
+        public void AddTransaction(Transaction transaction)
+        {
+            this._pendingTransactionsByHash.TryAdd(transaction.TransactionHash, transaction);
+
+            this.AddAddressNewAddress(transaction.From);
+            this.AddAddressNewAddress(transaction.To);
+
+            this.AddTransactionToAddress(transaction.From, transaction);
+            this.AddTransactionToAddress(transaction.To, transaction);
+        }
+
+
+        private void AddTransactionToAddress(string address, Transaction transaction)
+        {
+            if (!this._addresses.ContainsKey(address))
+            {
+                this.AddAddress(new Address(address));
+            }
+
+            this._addresses[address].Transactions.Add(transaction);
+        }
+
+        private void AddAddressNewAddress(string address)
+        {
+            if (!this._addresses.ContainsKey(address))
+            {
+                this._addresses.TryAdd(address, new Address(address));
             }
         }
 
@@ -209,20 +236,21 @@ namespace Node.Services
             Transaction[] processTransactions = transactions as Transaction[] ?? transactions.ToArray();
             foreach (Transaction t in processTransactions)
             {
-                t.From.Amount -= (long) t.Value;
-                t.To.Amount += (long) t.Value;
+                Address from = this.GetAddress(t.From);
+                from.Amount -= (long) t.Value;
+                Address to = this.GetAddress(t.To);
+                to.Amount += (long) t.Value;
 
                 t.MinedInBlockIndex = _candidate.Index;
                 t.TransferSuccessful = true;
 
                 this._confirmedTransactionsByHash.TryAdd(t.TransactionHash, t);
                 this._pendingTransactionsByHash.TryRemove(t.TransactionHash, out var ignore);
-                Console.WriteLine(ignore);
             }
 
             return processTransactions;
         }
-        
+
         public bool IsBlockValid(Block block)
         {
             // TODO: Validate block index, previous blockhash, BlockHash(based on Nonce, date, BlockDataHash)
@@ -235,25 +263,25 @@ namespace Node.Services
         private void ProcessGenesisBlock()
         {
             if (_genesisBlock != null) return;
-            Transaction faucet = new Transaction(new Address("0000000000000000000000000000000000000000"),
+            Transaction faucet = new Transaction(this.FirstAddress,
                 new Address("bee3f694bf0fbf9556273e85d43f2e521d24835e"), 2000000000, 0, "0", new string[2]);
             faucet.MinedInBlockIndex = 0;
             faucet.TransferSuccessful = true;
 
             this._confirmedTransactionsByHash.TryAdd(faucet.TransactionHash, faucet);
             this.AddAddressNewAddress(faucet.To);
-            this.AddTransactionToAddress(faucet.From, faucet.TransactionHash);
-            this.AddTransactionToAddress(faucet.To, faucet.TransactionHash);
-            this._addresses[faucet.To.AddressId].Amount += (long) faucet.Value;
+            this.AddTransactionToAddress(faucet.From, faucet);
+            this.AddTransactionToAddress(faucet.To, faucet);
+            this._addresses[faucet.To].Amount += (long) faucet.Value;
 
             List<Transaction> transactions = new List<Transaction>() {faucet};
             _genesisBlock = new Block(0, 5, string.Empty,
-                transactions, new Address("0000000000000000000000000000000000000000"));
+                transactions, this.FirstAddress.AddressId);
 
             this._blockchain.Add(_genesisBlock);
             this.PrepareCandidate();
         }
-        
+
         private void PrepareCandidate()
         {
             IEnumerable<Transaction> transactions = this.ProcessTransactions(GetTransactions(false));

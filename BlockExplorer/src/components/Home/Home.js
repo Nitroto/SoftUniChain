@@ -35,7 +35,7 @@ class Home extends Component {
         return (<div>
             <section className="section">
                 <div className="container">
-                    <h1 className="title">Latest Blocks</h1>
+                    <h1 className="title">Latest 10 Blocks</h1>
                     {this.state.blocks.length > 0 &&
                     <table className="table has-text-centered is-hoverable is-fullwidth">
                         <thead>
@@ -48,7 +48,9 @@ class Home extends Component {
                         </tr>
                         </thead>
                         <tbody>
-                        {this.state.blocks.reverse().slice(-10).map(block =>
+                        {this.state.blocks.sort(function (a, b) {
+                            return a.index - b.index
+                        }).slice(-10).reverse().map(block =>
                             <tr key={block.index}>
                                 <td>
                                     <Link to={'/blocks/' + block.index}>{block.index}</Link>

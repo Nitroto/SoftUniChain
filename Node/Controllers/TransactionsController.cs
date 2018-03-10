@@ -62,8 +62,10 @@ namespace Node.Controllers
 
             Transaction transaction = new Transaction(new Address(receivedTransaction.From),
                 new Address(receivedTransaction.To), receivedTransaction.Value, receivedTransaction.Fee,
-                receivedTransaction.SenderPublicKey, receivedTransaction.SenderSignature);
-            transaction.DateCreated = receivedTransaction.DateCreated;
+                receivedTransaction.SenderPublicKey, receivedTransaction.SenderSignature)
+            {
+                DateCreated = receivedTransaction.DateCreated
+            };
 
             transaction.TransactionHash = this._transactionService.CalculateTransactionHash(transaction);
 

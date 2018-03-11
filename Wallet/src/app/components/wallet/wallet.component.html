@@ -58,9 +58,12 @@
 
       <button mat-raised-button color="primary" (click)="getNodeInfo()">Get Info</button>
 
+
+      <!--Debug-->
       <div *ngIf="info$ | async as node">
         {{node | json}}
       </div>
+      <!---->
 
       <div class="addSomeSpace"></div>
     </div>
@@ -76,10 +79,10 @@
           <!--<p>{{ user | json }}</p>-->
           <h3 class="card-title">Your balance: <b>{{user.amount | currency:'SUC':'.2-5'}}</b></h3>
         </div>
-        <p class="card-text">{{ wallet.address }}</p>
+        <p class="card-text"><a href="http://localhost:3000/api/address/{{wallet.address}}">{{ wallet.address }}</a></p>
       </div>
       <ng-template #noUser>
-        <h3 class="card-title">Your balance: <b>{{0 | currency:'SUC':'.2-5'}}</b></h3>
+        <h3 class=" card-title">Your balance: <b>{{0 | currency:'SUC':'.2-5'}}</b></h3>
       </ng-template>
 
     </div>
